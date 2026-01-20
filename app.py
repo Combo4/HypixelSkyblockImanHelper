@@ -46,64 +46,94 @@ DATA = {
 }
 
 def generate_forge_schedule(item_name, slots, total_mult, start_time=None, sleep_time=None, wake_time=None, optimize_sleep=False):
-    """Generate an optimal forge schedule with sleep awareness"""
+    """Generate an optimal forge schedule with dependency awareness"""
     forge_tasks = []
+    task_dependencies = {}  # Maps task name to list of prerequisite names
     
-    def collect_tasks(item, count=1, depth=0):
+    def collect_tasks(item, count=1, depth=0, parent=None):
         if isinstance(item, dict):
             for sub_item, sub_qty in item.items():
-                collect_tasks(sub_item, sub_qty * count, depth)
+                collect_tasks(sub_item, sub_qty * count, depth, parent)
             return
         
+        # Find item in DATA or COMPONENTS
+        entry = None
         for cat in DATA:
             if item in DATA[cat]:
                 entry = DATA[cat][item]
-                if entry["time"] > 0.1:
-                    forge_tasks.append({
-                        "name": item,
-                        "time": entry["time"] * total_mult,
-                        "count": count,
-                        "depth": depth
-                    })
-                collect_tasks(entry["mats"], count, depth + 1)
-                return
+                break
         
-        if item in COMPONENTS:
-            comp = COMPONENTS[item]
-            if comp["time"] > 0:
-                forge_tasks.append({
-                    "name": item,
-                    "time": comp["time"] * total_mult,
-                    "count": count,
-                    "depth": depth
-                })
-            collect_tasks(comp["mats"], count, depth + 1)
+        if not entry and item in COMPONENTS:
+            entry = COMPONENTS[item]
+        
+        if entry and entry.get("time", 0) > 0.1:
+            # Track dependencies
+            if item not in task_dependencies:
+                task_dependencies[item] = []
+            
+            # Add forge-able materials as dependencies
+            for mat_name in entry.get("mats", {}).keys():
+                if is_forgeable(mat_name):
+                    task_dependencies[item].append(mat_name)
+            
+            # Create task
+            forge_tasks.append({
+                "name": item,
+                "time": entry["time"] * total_mult,
+                "count": count,
+                "depth": depth,
+                "dependencies": task_dependencies[item].copy()
+            })
+            
+            # Recurse into materials
+            collect_tasks(entry.get("mats", {}), count, depth + 1, item)
+    
+    def is_forgeable(item_name):
+        """Check if an item requires forging"""
+        for cat in DATA:
+            if item_name in DATA[cat] and DATA[cat][item_name].get("time", 0) > 0.1:
+                return True
+        if item_name in COMPONENTS and COMPONENTS[item_name].get("time", 0) > 0:
+            return True
+        return False
     
     collect_tasks(item_name)
     
-    # Sort tasks - if optimizing for sleep, prioritize longer tasks
-    if optimize_sleep:
-        forge_tasks.sort(key=lambda x: (-x["depth"], -x["time"]))  # Longest first
-    else:
-        forge_tasks.sort(key=lambda x: (-x["depth"], -x["time"]))
+    # Sort by depth first (deepest prerequisites first), then by duration
+    forge_tasks.sort(key=lambda x: (-x["depth"], -x["time"]))
     
     # Parse sleep schedule
     sleep_hours = None
     if optimize_sleep and sleep_time and wake_time:
         sleep_hours = parse_sleep_schedule(sleep_time, wake_time)
     
+    # Track when each item type finishes (for dependency checking)
+    item_completion_times = {}  # {item_name: [finish_time1, finish_time2, ...]}
+    
     slot_timelines = [[] for _ in range(slots)]
     slot_end_times = [0.0 for _ in range(slots)]
     
     for task in forge_tasks:
         for i in range(task["count"]):
-            # Find best slot considering sleep schedule
-            if optimize_sleep and sleep_hours:
-                best_slot = find_best_slot_with_sleep(slot_end_times, task["time"], sleep_hours)
-            else:
-                best_slot = slot_end_times.index(min(slot_end_times))
+            # Calculate earliest start time based on dependencies
+            earliest_start = 0.0
             
-            task_start = slot_end_times[best_slot]
+            for dep in task["dependencies"]:
+                if dep in item_completion_times and item_completion_times[dep]:
+                    # Use the earliest available completed dependency
+                    earliest_start = max(earliest_start, min(item_completion_times[dep]))
+                    # Remove this used dependency instance
+                    item_completion_times[dep].remove(min(item_completion_times[dep]))
+            
+            # Find best slot that respects the earliest start time
+            if optimize_sleep and sleep_hours:
+                best_slot = find_best_slot_with_dependencies(
+                    slot_end_times, task["time"], sleep_hours, earliest_start
+                )
+            else:
+                best_slot = find_best_slot_simple(slot_end_times, earliest_start)
+            
+            task_start = max(slot_end_times[best_slot], earliest_start)
             task_end = task_start + task["time"]
             
             slot_timelines[best_slot].append({
@@ -114,8 +144,53 @@ def generate_forge_schedule(item_name, slots, total_mult, start_time=None, sleep
                 "completed": False
             })
             slot_end_times[best_slot] = task_end
+            
+            # Track completion time for this item instance
+            if task["name"] not in item_completion_times:
+                item_completion_times[task["name"]] = []
+            item_completion_times[task["name"]].append(task_end)
     
     return slot_timelines
+
+def find_best_slot_simple(slot_end_times, earliest_start):
+    """Find the slot that can start soonest after earliest_start"""
+    best_slot = 0
+    best_time = float('inf')
+    
+    for i, end_time in enumerate(slot_end_times):
+        actual_start = max(end_time, earliest_start)
+        if actual_start < best_time:
+            best_time = actual_start
+            best_slot = i
+    
+    return best_slot
+
+def find_best_slot_with_dependencies(slot_end_times, task_duration, sleep_hours, earliest_start):
+    """Find the best slot considering both dependencies and sleep schedule"""
+    best_slot = 0
+    best_score = float('inf')
+    
+    for i, end_time in enumerate(slot_end_times):
+        actual_start = max(end_time, earliest_start)
+        score = actual_start
+        
+        # Check if task would span sleep time
+        task_start_hour = actual_start % 24
+        
+        # Long tasks (>6h) should start before sleep if possible
+        if task_duration >= 6:
+            if task_start_hour < sleep_hours['sleep'] - 2:
+                score -= 5  # Bonus for starting before sleep
+        else:
+            # Short tasks should be during awake hours
+            if task_start_hour >= sleep_hours['wake'] or task_start_hour < sleep_hours['sleep']:
+                score -= 3  # Bonus for awake time
+        
+        if score < best_score:
+            best_score = score
+            best_slot = i
+    
+    return best_slot
 
 def parse_sleep_schedule(sleep_time, wake_time):
     """Parse sleep and wake times to calculate sleep duration"""
@@ -135,33 +210,6 @@ def parse_sleep_schedule(sleep_time, wake_time):
         'duration': wake_decimal - sleep_decimal
     }
 
-def find_best_slot_with_sleep(slot_end_times, task_duration, sleep_hours):
-    """Find the best slot considering sleep schedule"""
-    best_slot = 0
-    best_score = float('inf')
-    
-    for i, end_time in enumerate(slot_end_times):
-        score = end_time
-        
-        # Check if task would span sleep time
-        task_end_hour = end_time % 24
-        task_finish_hour = (end_time + task_duration) % 24
-        
-        # Long tasks (>6h) should start before sleep if possible
-        if task_duration >= 6:
-            # Prefer slots that finish just before or during sleep
-            if task_end_hour < sleep_hours['sleep'] - 2:
-                score -= 5  # Bonus for starting before sleep
-        else:
-            # Short tasks should be during awake hours
-            if task_end_hour >= sleep_hours['wake'] or task_end_hour < sleep_hours['sleep']:
-                score -= 3  # Bonus for awake time
-        
-        if score < best_score:
-            best_score = score
-            best_slot = i
-    
-    return best_slot
 
 @app.route('/')
 def index():
@@ -239,33 +287,40 @@ def calculate():
     days = int(parallel_hours // 24)
     hours = int(parallel_hours % 24)
     
-    # Get tips
-    tips = []
-    if category == "Drills":
-        tips = [
-            "Refined materials have long wait times - start early",
-            "Drill Motors take 30 hours - perfect for overnight",
-            "Golden Plates need Refined Diamonds as dependency"
-        ]
-    elif category == "Fuel Tanks":
-        tips = [
-            "Start with Mithril-Infused (10h) and Titanium (20h)",
-            "Gemstone Mixtures are fast (4h each)"
-        ]
-    else:
-        tips = [
-            "Both engine tiers take 24 hours each",
-            "Start Drill Motors early (30h each)",
-            "Work on Mithril Plates and Refined materials first"
-        ]
+    # Calculate forge materials needed (all items that need forging)
+    forge_materials = {}
+    
+    def collect_forge_items(item, count=1):
+        if isinstance(item, dict):
+            for sub_item, sub_qty in item.items():
+                collect_forge_items(sub_item, sub_qty * count)
+            return
+        
+        # Check if it's in DATA
+        for cat in DATA:
+            if item in DATA[cat]:
+                entry = DATA[cat][item]
+                if entry["time"] > 0.1:
+                    forge_materials[item] = forge_materials.get(item, 0) + count
+                collect_forge_items(entry["mats"], count)
+                return
+        
+        # Check if it's in COMPONENTS
+        if item in COMPONENTS:
+            comp = COMPONENTS[item]
+            if comp["time"] > 0:
+                forge_materials[item] = forge_materials.get(item, 0) + count
+            collect_forge_items(comp["mats"], count)
+    
+    collect_forge_items(item_name)
     
     return jsonify({
         'schedule': schedule,
         'materials': final_mats,
+        'forge_materials': forge_materials,
         'total_hours': round(total_man_hours, 1),
         'calendar_days': days,
-        'calendar_hours': hours,
-        'tips': tips
+        'calendar_hours': hours
     })
 
 @app.route('/api/save', methods=['POST'])

@@ -1,3 +1,46 @@
+// Material Properties Database
+const MATERIAL_PROPERTIES = {
+    // Blocks
+    "Enchanted Diamond Block": { type: "block", blockStrength: 2500, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
+    "Enchanted Gold Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
+    "Enchanted Iron Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
+    "Enchanted Redstone Block": { type: "block", blockStrength: 2500, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
+    "Enchanted Coal Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
+    
+    // Dwarven Metals
+    "Enchanted Mithril": { type: "dwarven_metal", blockStrength: 1500, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
+    "Enchanted Titanium": { type: "dwarven_metal", blockStrength: 2000, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
+    
+    // Ores (for future expansion)
+    "Coal": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Iron Ore": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Gold Ore": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Diamond Ore": { type: "ore", blockStrength: 3000, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    
+    // Gemstones
+    "Ruby": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Sapphire": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Jade": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Amethyst": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Amber": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Topaz": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Jasper": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    
+    // Non-mineable materials (will be skipped in mining calculations)
+    "Glacite Jewel": { type: "non_mineable" },
+    "Treasurite": { type: "non_mineable" },
+    "Plasma": { type: "non_mineable" },
+    "Sludge Juice": { type: "non_mineable" },
+    "Divan's Alloy": { type: "non_mineable" },
+    "Fine Diamond": { type: "non_mineable" },
+    "Fine Ruby": { type: "non_mineable" },
+    "Fine Emerald": { type: "non_mineable" },
+    "Fine Sapphire": { type: "non_mineable" },
+    "Perfect Amber": { type: "non_mineable" },
+    "Perfect Sapphire": { type: "non_mineable" },
+    "Perfect Ruby": { type: "non_mineable" }
+};
+
 // Global state
 let currentSchedule = null;
 let currentData = null;
@@ -53,6 +96,9 @@ function setupEventListeners() {
     saveBtn.addEventListener('click', saveSchedule);
     loadBtn.addEventListener('click', loadSchedule);
     resetBtn.addEventListener('click', resetCompletion);
+    
+    // Mining calculator button
+    document.getElementById('calculate-mining-btn').addEventListener('click', calculateMiningTime);
 }
 
 // Tab Switching
@@ -146,6 +192,21 @@ async function calculate() {
 
         const data = await response.json();
         currentSchedule = data.schedule;
+        // Capture mining stats for auto-fill
+        const miningStats = {
+            mining_speed: document.getElementById('mining-speed').value,
+            base_fortune: document.getElementById('base-fortune').value,
+            block_fortune: document.getElementById('block-fortune').value,
+            ore_fortune: document.getElementById('ore-fortune').value,
+            dwarven_fortune: document.getElementById('dwarven-fortune').value,
+            gemstone_fortune: document.getElementById('gemstone-fortune').value,
+            pristine: document.getElementById('pristine').value,
+            mining_spread: document.getElementById('mining-spread').value,
+            gemstone_spread: document.getElementById('gemstone-spread').value,
+            efficiency: document.getElementById('efficiency').value,
+            ping: document.getElementById('ping').value
+        };
+
         currentData = { 
             item, 
             category, 
@@ -156,6 +217,7 @@ async function calculate() {
             sleep_time: sleepTime,
             wake_time: wakeTime,
             optimize_sleep: optimizeSleep,
+            mining_stats: miningStats,
             ...data 
         };
 
@@ -283,7 +345,7 @@ function renderTask(task, slotIndex, taskIndex, isCompleted) {
 function renderSummary(data) {
     let html = `
         <div class="summary-section">
-            <h3>📊 Total Raw Materials Needed</h3>
+            <h3>📦 Raw Materials Needed</h3>
             <ul class="materials-list">`;
 
     Object.entries(data.materials).sort().forEach(([item, qty]) => {
@@ -296,20 +358,73 @@ function renderSummary(data) {
         <div class="summary-section">
             <h3>⏰ Time Estimate</h3>
             <div class="time-info">
-                <p>Total Man-Hours: ${data.total_hours}h</p>
-                <p>Calendar Time (${currentData.slots} slots): ${data.calendar_days}d, ${data.calendar_hours}h</p>
+                <p>Total Man-Hours: <strong>${data.total_hours}h</strong></p>
+                <p>Calendar Time (${currentData.slots} slots): <strong>${data.calendar_days}d ${data.calendar_hours}h</strong></p>
             </div>
         </div>
 
         <div class="summary-section">
-            <h3>💡 Efficiency Tips</h3>
-            <ul class="tips-list">`;
+            <h3>🔨 Forge Items Needed</h3>
+            <ul class="materials-list">`;
 
-    data.tips.forEach(tip => {
-        html += `<li>• ${tip}</li>`;
-    });
+    if (data.forge_materials && Object.keys(data.forge_materials).length > 0) {
+        Object.entries(data.forge_materials).sort().forEach(([item, qty]) => {
+            html += `<li>• ${item}: <strong>${qty}</strong></li>`;
+        });
+    } else {
+        html += `<li style="color: #999; font-style: italic;">No intermediate forge items required</li>`;
+    }
 
     html += `</ul></div>`;
+
+    // Add Mining Breakdown Section
+    const miningData = calculateMiningBreakdown(data.materials);
+    
+    if (miningData.breakdown.length > 0) {
+        html += `
+        <div class="summary-section">
+            <h3>⛏️ Mining Requirements</h3>
+            <p style="color: #ff6600; font-size: 1.2em; margin-bottom: 15px;">
+                Total Mining Time: <strong>${miningData.totalTime}</strong>
+            </p>
+            <table style="width: 100%; border-collapse: collapse; color: #ccc;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #ff6600; text-align: left;">
+                        <th style="padding: 8px;">Material</th>
+                        <th style="padding: 8px;">Quantity</th>
+                        <th style="padding: 8px;">Fortune Type</th>
+                        <th style="padding: 8px;">Blocks Needed</th>
+                        <th style="padding: 8px;">Time</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+        
+        miningData.breakdown.forEach(item => {
+            const fortuneColor = {
+                'block': '#8B4513',
+                'ore': '#C0C0C0', 
+                'dwarven_metal': '#FFD700',
+                'gemstone': '#FF1493'
+            }[item.fortuneType] || '#999';
+            
+            html += `
+                    <tr style="border-bottom: 1px solid #3a3a3a;">
+                        <td style="padding: 8px;">${item.material}</td>
+                        <td style="padding: 8px;">${item.quantity.toLocaleString()}</td>
+                        <td style="padding: 8px; color: ${fortuneColor};">${item.fortuneType.replace('_', ' ')}</td>
+                        <td style="padding: 8px;">${item.blocksNeeded.toLocaleString()} (${item.dropsPerBlock}/block)</td>
+                        <td style="padding: 8px; color: #ffaa00;"><strong>${item.time}</strong></td>
+                    </tr>`;
+        });
+        
+        html += `
+                </tbody>
+            </table>
+            <button onclick="switchTab('mining')" class="btn btn-primary" style="margin-top: 15px;">
+                ⛏️ View Detailed Mining Calculator
+            </button>
+        </div>`;
+    }
 
     summaryView.innerHTML = html;
 }
@@ -351,6 +466,21 @@ function autoLoadFromBrowser() {
             if (data.sleep_time) sleepTimeInput.value = data.sleep_time;
             if (data.wake_time) wakeTimeInput.value = data.wake_time;
             if (data.optimize_sleep !== undefined) optimizeSleepCheckbox.checked = data.optimize_sleep;
+            
+            // Restore mining stats
+            if (data.mining_stats) {
+                if (data.mining_stats.mining_speed) document.getElementById('mining-speed').value = data.mining_stats.mining_speed;
+                if (data.mining_stats.base_fortune) document.getElementById('base-fortune').value = data.mining_stats.base_fortune;
+                if (data.mining_stats.block_fortune) document.getElementById('block-fortune').value = data.mining_stats.block_fortune;
+                if (data.mining_stats.ore_fortune) document.getElementById('ore-fortune').value = data.mining_stats.ore_fortune;
+                if (data.mining_stats.dwarven_fortune) document.getElementById('dwarven-fortune').value = data.mining_stats.dwarven_fortune;
+                if (data.mining_stats.gemstone_fortune) document.getElementById('gemstone-fortune').value = data.mining_stats.gemstone_fortune;
+                if (data.mining_stats.pristine) document.getElementById('pristine').value = data.mining_stats.pristine;
+                if (data.mining_stats.mining_spread) document.getElementById('mining-spread').value = data.mining_stats.mining_spread;
+                if (data.mining_stats.gemstone_spread) document.getElementById('gemstone-spread').value = data.mining_stats.gemstone_spread;
+                if (data.mining_stats.efficiency) document.getElementById('efficiency').value = data.mining_stats.efficiency;
+                if (data.mining_stats.ping) document.getElementById('ping').value = data.mining_stats.ping;
+            }
             
             // Restore item after category is set
             if (data.category && data.item) {
@@ -487,6 +617,235 @@ function toggleCollapsed(slotIndex) {
         btnText.textContent = `Show ${count} More`;
         btnIcon.textContent = '▼';
     }
+}
+
+// Mining Time Calculator (Enhanced with fortune types and spread)
+function calculateMiningTime() {
+    const materialSelect = document.getElementById('material-select').value;
+    const miningSpeed = parseFloat(document.getElementById('mining-speed').value);
+    const baseFortune = parseFloat(document.getElementById('base-fortune').value) || 0;
+    const blockFortune = parseFloat(document.getElementById('block-fortune').value) || 0;
+    const oreFortune = parseFloat(document.getElementById('ore-fortune').value) || 0;
+    const dwarvenFortune = parseFloat(document.getElementById('dwarven-fortune').value) || 0;
+    const gemstoneFortune = parseFloat(document.getElementById('gemstone-fortune').value) || 0;
+    const pristine = parseFloat(document.getElementById('pristine').value) || 0;
+    const miningSpread = parseFloat(document.getElementById('mining-spread').value) || 0;
+    const gemstoneSpread = parseFloat(document.getElementById('gemstone-spread').value) || 0;
+    const efficiency = parseFloat(document.getElementById('efficiency').value) / 100;
+    const ping = parseFloat(document.getElementById('ping').value);
+    const targetQuantity = parseFloat(document.getElementById('target-quantity').value);
+
+    if (!materialSelect || !miningSpeed) {
+        showToast('Please select a material and enter mining speed', 'error');
+        return;
+    }
+
+    // Extract block strength from material value
+    const blockStrength = parseFloat(materialSelect.split('-')[1]);
+    const isGemstone = materialSelect.includes('ruby') || materialSelect.includes('sapphire') || 
+                       materialSelect.includes('jade') || materialSelect.includes('amethyst') || 
+                       materialSelect.includes('amber') || materialSelect.includes('topaz') || 
+                       materialSelect.includes('jasper');
+
+    // Determine fortune type
+    let totalFortune = baseFortune;
+    let spreadValue = 0;
+    
+    if (isGemstone) {
+        totalFortune += gemstoneFortune;
+        spreadValue = gemstoneSpread;
+    } else if (materialSelect.includes('mithril') || materialSelect.includes('titanium')) {
+        totalFortune += dwarvenFortune;
+        spreadValue = miningSpread;
+    } else if (materialSelect.includes('coal') || materialSelect.includes('iron') || 
+               materialSelect.includes('gold') || materialSelect.includes('diamond')) {
+        totalFortune += oreFortune;
+        spreadValue = miningSpread;
+    } else {
+        totalFortune += blockFortune;
+        spreadValue = miningSpread;
+    }
+
+    // Calculate mining time in ticks
+    let ticks = Math.floor((blockStrength * 30) / miningSpeed);
+    
+    // Softcap: minimum 4 ticks
+    if (ticks < 4) ticks = 4;
+    
+    // Convert to seconds (1 tick = 0.05s) and add ping delay
+    const breakTimeSeconds = (ticks * 0.05) + (ping / 1000);
+
+    // Calculate spread multiplier
+    let spreadMultiplier = 1;
+    if (spreadValue > 0) {
+        const guaranteedBlocks = Math.floor(spreadValue / 100);
+        const chancePercent = spreadValue % 100;
+        spreadMultiplier = 1 + guaranteedBlocks + (chancePercent / 100);
+    }
+
+    // Calculate drops per block
+    let dropsPerBlock;
+    if (isGemstone) {
+        // Base gemstone drops: 3-5, average = 4
+        const baseDrop = 4;
+        
+        // Mining fortune multiplier
+        const fortuneMultiplier = 1 + (totalFortune / 100);
+        
+        // Rough gemstones from fortune
+        const roughGems = baseDrop * fortuneMultiplier;
+        
+        // Pristine bonus: each rough gem has pristine% chance to become flawed
+        const pristineBonus = pristine / 100 * 0.79;
+        dropsPerBlock = roughGems * (1 + pristineBonus) * spreadMultiplier;
+    } else {
+        // Non-gemstone: simple fortune multiplication
+        const baseDrop = 1;
+        dropsPerBlock = baseDrop * (1 + (totalFortune / 100)) * spreadMultiplier;
+    }
+
+    // Calculate blocks needed
+    const blocksNeeded = Math.ceil(targetQuantity / dropsPerBlock);
+
+    // Calculate blocks per hour with efficiency
+    const blocksPerHourTheoretical = 3600 / breakTimeSeconds;
+    const blocksPerHourActual = blocksPerHourTheoretical * efficiency;
+
+    // Calculate time needed
+    const hoursNeeded = blocksNeeded / blocksPerHourActual;
+    const minutesNeeded = hoursNeeded * 60;
+
+    // Format time estimate
+    let timeEstimate;
+    if (hoursNeeded >= 1) {
+        const hours = Math.floor(hoursNeeded);
+        const minutes = Math.floor((hoursNeeded - hours) * 60);
+        timeEstimate = `${hours}h ${minutes}m`;
+    } else {
+        timeEstimate = `${Math.ceil(minutesNeeded)}m`;
+    }
+
+    // Display results
+    const spreadInfo = spreadMultiplier > 1 ? ` (×${spreadMultiplier.toFixed(2)} spread)` : '';
+    document.getElementById('break-ticks').textContent = `${ticks} ticks (${(ticks * 0.05).toFixed(2)}s + ${ping}ms ping)`;
+    document.getElementById('drops-per-block').textContent = `${dropsPerBlock.toFixed(2)}${spreadInfo}`;
+    document.getElementById('blocks-needed').textContent = blocksNeeded.toLocaleString();
+    document.getElementById('blocks-per-hour').textContent = Math.floor(blocksPerHourActual).toLocaleString();
+    document.getElementById('mining-time').textContent = timeEstimate;
+    document.getElementById('mining-results').style.display = 'block';
+
+    showToast('Mining time calculated!');
+}
+
+// Calculate mining breakdown for all raw materials
+function calculateMiningBreakdown(materials) {
+    const miningSpeed = parseFloat(document.getElementById('mining-speed').value) || 5000;
+    const baseFortune = parseFloat(document.getElementById('base-fortune').value) || 200;
+    const blockFortune = parseFloat(document.getElementById('block-fortune').value) || 0;
+    const oreFortune = parseFloat(document.getElementById('ore-fortune').value) || 0;
+    const dwarvenFortune = parseFloat(document.getElementById('dwarven-fortune').value) || 0;
+    const gemstoneFortune = parseFloat(document.getElementById('gemstone-fortune').value) || 0;
+    const pristine = parseFloat(document.getElementById('pristine').value) || 0;
+    const miningSpread = parseFloat(document.getElementById('mining-spread').value) || 0;
+    const gemstoneSpread = parseFloat(document.getElementById('gemstone-spread').value) || 0;
+    const efficiency = parseFloat(document.getElementById('efficiency').value) / 100 || 0.5;
+    const ping = parseFloat(document.getElementById('ping').value) || 50;
+
+    const breakdown = [];
+    let totalMinutes = 0;
+
+    for (const [materialName, quantity] of Object.entries(materials)) {
+        const props = MATERIAL_PROPERTIES[materialName];
+        
+        // Skip non-mineable materials
+        if (!props || props.type === 'non_mineable') {
+            continue;
+        }
+
+        // Determine total fortune based on material type
+        let totalFortune = baseFortune;
+        let spreadValue = 0;
+        
+        if (props.fortuneType === 'gemstone') {
+            totalFortune += gemstoneFortune;
+            spreadValue = gemstoneSpread;
+        } else if (props.fortuneType === 'dwarven_metal') {
+            totalFortune += dwarvenFortune;
+            spreadValue = miningSpread;
+        } else if (props.fortuneType === 'ore') {
+            totalFortune += oreFortune;
+            spreadValue = miningSpread;
+        } else if (props.fortuneType === 'block') {
+            totalFortune += blockFortune;
+            spreadValue = miningSpread;
+        }
+
+        // Calculate mining time in ticks
+        let ticks = Math.floor((props.blockStrength * 30) / miningSpeed);
+        if (ticks < 4) ticks = 4;
+        const breakTimeSeconds = (ticks * 0.05) + (ping / 1000);
+
+        // Calculate spread multiplier
+        let spreadMultiplier = 1;
+        if (spreadValue > 0) {
+            const guaranteedBlocks = Math.floor(spreadValue / 100);
+            const chancePercent = spreadValue % 100;
+            spreadMultiplier = 1 + guaranteedBlocks + (chancePercent / 100);
+        }
+
+        // Calculate drops per block
+        let dropsPerBlock;
+        if (props.fortuneType === 'gemstone') {
+            const baseDrop = props.baseDrop || 4;
+            const fortuneMultiplier = 1 + (totalFortune / 100);
+            const roughGems = baseDrop * fortuneMultiplier;
+            const pristineBonus = pristine / 100 * 0.79;
+            dropsPerBlock = roughGems * (1 + pristineBonus) * spreadMultiplier;
+        } else {
+            const baseDrop = props.baseDrop || 1;
+            dropsPerBlock = baseDrop * (1 + (totalFortune / 100)) * spreadMultiplier;
+        }
+
+        // Calculate blocks needed and time
+        const blocksNeeded = Math.ceil(quantity / dropsPerBlock);
+        const blocksPerHourActual = (3600 / breakTimeSeconds) * efficiency;
+        const hoursNeeded = blocksNeeded / blocksPerHourActual;
+        const minutesNeeded = hoursNeeded * 60;
+
+        totalMinutes += minutesNeeded;
+
+        // Format time
+        let timeStr;
+        if (hoursNeeded >= 1) {
+            const hours = Math.floor(hoursNeeded);
+            const minutes = Math.floor((hoursNeeded - hours) * 60);
+            timeStr = `${hours}h ${minutes}m`;
+        } else {
+            timeStr = `${Math.ceil(minutesNeeded)}m`;
+        }
+
+        breakdown.push({
+            material: materialName,
+            quantity: quantity,
+            fortuneType: props.fortuneType,
+            blocksNeeded: blocksNeeded,
+            dropsPerBlock: dropsPerBlock.toFixed(2),
+            time: timeStr,
+            minutes: minutesNeeded
+        });
+    }
+
+    // Format total time
+    let totalTimeStr;
+    if (totalMinutes >= 60) {
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = Math.floor(totalMinutes % 60);
+        totalTimeStr = `${hours}h ${minutes}m`;
+    } else {
+        totalTimeStr = `${Math.ceil(totalMinutes)}m`;
+    }
+
+    return { breakdown, totalTime: totalTimeStr, totalMinutes };
 }
 
 // Show Toast Notification

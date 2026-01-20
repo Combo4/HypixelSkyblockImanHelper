@@ -94,6 +94,7 @@
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="calendar">📅 Forge Calendar</button>
                     <button class="tab-btn" data-tab="summary">📊 Summary</button>
+                    <button class="tab-btn" data-tab="mining">⛏️ Mining Time</button>
                 </div>
 
                 <!-- Calendar Tab -->
@@ -107,6 +108,136 @@
                 <div id="summary-tab" class="tab-content">
                     <div id="summary-view">
                         <p class="placeholder-text">Summary will appear here after calculation.</p>
+                    </div>
+                </div>
+
+                <!-- Mining Time Calculator Tab -->
+                <div id="mining-tab" class="tab-content">
+                    <div class="mining-calculator">
+                        <h2>⛏️ Mining Time Estimator</h2>
+                        <p class="subtitle" style="color: #999; margin-bottom: 20px;">Calculate how long it takes to mine materials</p>
+
+                        <div class="mining-inputs">
+                            <div class="form-group">
+                                <label for="material-select">Material:</label>
+                                <select id="material-select">
+                                    <option value="">-- Select Material --</option>
+                                    <optgroup label="Gemstones (Full Block)">
+                                        <option value="ruby-3200">Ruby Block (BS: 3200)</option>
+                                        <option value="sapphire-3200">Sapphire Block (BS: 3200)</option>
+                                        <option value="jade-3200">Jade Block (BS: 3200)</option>
+                                        <option value="amethyst-3200">Amethyst Block (BS: 3200)</option>
+                                        <option value="amber-3200">Amber Block (BS: 3200)</option>
+                                        <option value="topaz-3200">Topaz Block (BS: 3200)</option>
+                                        <option value="jasper-3200">Jasper Block (BS: 3200)</option>
+                                    </optgroup>
+                                    <optgroup label="Other Ores">
+                                        <option value="mithril-1500">Mithril (BS: 1500)</option>
+                                        <option value="hardstone-2500">Hard Stone (BS: 2500)</option>
+                                        <option value="diamond-3000">Diamond Ore (BS: 3000)</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="mining-speed">⸕ Mining Speed:</label>
+                                <input type="number" id="mining-speed" value="5000" min="0" step="100">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="base-fortune">☘ Base Mining Fortune:</label>
+                                <input type="number" id="base-fortune" value="200" min="0" step="10">
+                                <small style="color: #888;">Applies to all materials</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="block-fortune">☘ Block Fortune:</label>
+                                <input type="number" id="block-fortune" value="0" min="0" step="10">
+                                <small style="color: #888;">For blocks (Hard Stone, etc.)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ore-fortune">☘ Ore Fortune:</label>
+                                <input type="number" id="ore-fortune" value="0" min="0" step="10">
+                                <small style="color: #888;">For ores (Coal, Diamond, etc.)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dwarven-fortune">☘ Dwarven Metal Fortune:</label>
+                                <input type="number" id="dwarven-fortune" value="0" min="0" step="10">
+                                <small style="color: #888;">For Mithril, Titanium</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gemstone-fortune">☘ Gemstone Fortune:</label>
+                                <input type="number" id="gemstone-fortune" value="0" min="0" step="10">
+                                <small style="color: #888;">For gemstones only</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="pristine">✧ Pristine (%):</label>
+                                <input type="number" id="pristine" value="10" min="0" max="25" step="0.1">
+                                <small style="color: #888;">For gemstones only</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="mining-spread">▚ Mining Spread:</label>
+                                <input type="number" id="mining-spread" value="0" min="0" step="1">
+                                <small style="color: #888;">For Blocks/Ores/Dwarven Metals</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gemstone-spread">▚ Gemstone Spread:</label>
+                                <input type="number" id="gemstone-spread" value="0" min="0" max="100" step="0.1">
+                                <small style="color: #888;">For gemstones only (max ~10)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="efficiency">Efficiency (%):</label>
+                                <input type="number" id="efficiency" value="50" min="1" max="100" step="1">
+                                <small style="color: #888;">Human mining efficiency (40-60% typical)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="ping">Ping (ms):</label>
+                                <input type="number" id="ping" value="50" min="0" max="500" step="10">
+                                <small style="color: #888;">Additional delay per block</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="target-quantity">Target Quantity:</label>
+                                <input type="number" id="target-quantity" value="160" min="1" step="1">
+                                <small style="color: #888;">How many items you need</small>
+                            </div>
+                        </div>
+
+                        <button id="calculate-mining-btn" class="btn btn-primary" style="margin: 20px 0;">⛏️ Calculate Mining Time</button>
+
+                        <div id="mining-results" style="display: none;">
+                            <h3 style="color: #ffaa00; margin-top: 20px;">Results</h3>
+                            <div class="mining-stats">
+                                <div class="stat-card">
+                                    <div class="stat-label">Break Speed</div>
+                                    <div class="stat-value" id="break-ticks">-</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">Drops Per Block</div>
+                                    <div class="stat-value" id="drops-per-block">-</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">Blocks Needed</div>
+                                    <div class="stat-value" id="blocks-needed">-</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">Blocks Per Hour</div>
+                                    <div class="stat-value" id="blocks-per-hour">-</div>
+                                </div>
+                                <div class="stat-card" style="grid-column: 1 / -1;">
+                                    <div class="stat-label">⏱️ Estimated Time</div>
+                                    <div class="stat-value" id="mining-time" style="font-size: 2em; color: #ff6600;">-</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
