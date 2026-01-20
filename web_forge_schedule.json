@@ -1,0 +1,738 @@
+{
+  "item": "Titanium Drill DR-X455",
+  "category": "Drills",
+  "slots": 5,
+  "quick_forge": true,
+  "cole": false,
+  "calendar_days": 5,
+  "calendar_hours": 3,
+  "materials": {
+    "Enchanted Coal Block": 2,
+    "Enchanted Diamond Block": 44,
+    "Enchanted Gold Block": 24,
+    "Enchanted Iron Block": 11,
+    "Enchanted Mithril": 5280,
+    "Enchanted Redstone Block": 3,
+    "Enchanted Titanium": 400,
+    "Glacite Jewel": 60,
+    "Treasurite": 10
+  },
+  "schedule": [
+    [
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 5.6,
+        "name": "Refined Diamond",
+        "start": 0
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 11.2,
+        "name": "Refined Diamond",
+        "start": 5.6
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 16.799999999999997,
+        "name": "Refined Diamond",
+        "start": 11.2
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 25.199999999999996,
+        "name": "Refined Titanium",
+        "start": 16.799999999999997
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 33.599999999999994,
+        "name": "Refined Titanium",
+        "start": 25.199999999999996
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 41.99999999999999,
+        "name": "Refined Titanium",
+        "start": 33.599999999999994
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 46.19999999999999,
+        "name": "Golden Plate",
+        "start": 41.99999999999999
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 50.39999999999999,
+        "name": "Refined Mithril",
+        "start": 46.19999999999999
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 54.599999999999994,
+        "name": "Refined Mithril",
+        "start": 50.39999999999999
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 58.8,
+        "name": "Refined Mithril",
+        "start": 54.599999999999994
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 63,
+        "name": "Refined Mithril",
+        "start": 58.8
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 67.2,
+        "name": "Refined Mithril",
+        "start": 63
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 71.4,
+        "name": "Refined Mithril",
+        "start": 67.2
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 75.60000000000001,
+        "name": "Golden Plate",
+        "start": 71.4
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 79.80000000000001,
+        "name": "Golden Plate",
+        "start": 75.60000000000001
+      },
+      {
+        "completed": false,
+        "duration": 12.6,
+        "end": 92.4,
+        "name": "Mithril Plate",
+        "start": 79.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 100.80000000000001,
+        "name": "Refined Titanium",
+        "start": 92.4
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 109.20000000000002,
+        "name": "Refined Titanium",
+        "start": 100.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 114.80000000000001,
+        "name": "Refined Diamond",
+        "start": 109.20000000000002
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 120.4,
+        "name": "Refined Diamond",
+        "start": 114.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 126,
+        "name": "Refined Diamond",
+        "start": 120.4
+      }
+    ],
+    [
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 5.6,
+        "name": "Refined Diamond",
+        "start": 0
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 11.2,
+        "name": "Refined Diamond",
+        "start": 5.6
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 16.799999999999997,
+        "name": "Refined Diamond",
+        "start": 11.2
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 25.199999999999996,
+        "name": "Refined Titanium",
+        "start": 16.799999999999997
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 33.599999999999994,
+        "name": "Refined Titanium",
+        "start": 25.199999999999996
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 41.99999999999999,
+        "name": "Refined Titanium",
+        "start": 33.599999999999994
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 46.19999999999999,
+        "name": "Golden Plate",
+        "start": 41.99999999999999
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 50.39999999999999,
+        "name": "Refined Mithril",
+        "start": 46.19999999999999
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 54.599999999999994,
+        "name": "Refined Mithril",
+        "start": 50.39999999999999
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 58.8,
+        "name": "Refined Mithril",
+        "start": 54.599999999999994
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 63,
+        "name": "Refined Mithril",
+        "start": 58.8
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 67.2,
+        "name": "Refined Mithril",
+        "start": 63
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 71.4,
+        "name": "Refined Mithril",
+        "start": 67.2
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 75.60000000000001,
+        "name": "Golden Plate",
+        "start": 71.4
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 79.80000000000001,
+        "name": "Golden Plate",
+        "start": 75.60000000000001
+      },
+      {
+        "completed": false,
+        "duration": 12.6,
+        "end": 92.4,
+        "name": "Mithril Plate",
+        "start": 79.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 100.80000000000001,
+        "name": "Refined Titanium",
+        "start": 92.4
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 109.20000000000002,
+        "name": "Refined Titanium",
+        "start": 100.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 114.80000000000001,
+        "name": "Refined Diamond",
+        "start": 109.20000000000002
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 120.4,
+        "name": "Refined Diamond",
+        "start": 114.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 126,
+        "name": "Refined Diamond",
+        "start": 120.4
+      }
+    ],
+    [
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 5.6,
+        "name": "Refined Diamond",
+        "start": 0
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 11.2,
+        "name": "Refined Diamond",
+        "start": 5.6
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 15.399999999999999,
+        "name": "Golden Plate",
+        "start": 11.2
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 23.799999999999997,
+        "name": "Refined Titanium",
+        "start": 15.399999999999999
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 32.199999999999996,
+        "name": "Refined Titanium",
+        "start": 23.799999999999997
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 40.599999999999994,
+        "name": "Refined Titanium",
+        "start": 32.199999999999996
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 44.8,
+        "name": "Golden Plate",
+        "start": 40.599999999999994
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 49,
+        "name": "Golden Plate",
+        "start": 44.8
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 53.2,
+        "name": "Refined Mithril",
+        "start": 49
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 57.400000000000006,
+        "name": "Refined Mithril",
+        "start": 53.2
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 61.60000000000001,
+        "name": "Refined Mithril",
+        "start": 57.400000000000006
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 65.80000000000001,
+        "name": "Refined Mithril",
+        "start": 61.60000000000001
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 70.00000000000001,
+        "name": "Refined Mithril",
+        "start": 65.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 74.20000000000002,
+        "name": "Refined Mithril",
+        "start": 70.00000000000001
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 78.40000000000002,
+        "name": "Refined Mithril",
+        "start": 74.20000000000002
+      },
+      {
+        "completed": false,
+        "duration": 12.6,
+        "end": 91.00000000000001,
+        "name": "Mithril Plate",
+        "start": 78.40000000000002
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 99.4,
+        "name": "Refined Titanium",
+        "start": 91.00000000000001
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 107.80000000000001,
+        "name": "Refined Titanium",
+        "start": 99.4
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 116.20000000000002,
+        "name": "Refined Titanium",
+        "start": 107.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 121.80000000000001,
+        "name": "Refined Diamond",
+        "start": 116.20000000000002
+      }
+    ],
+    [
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 5.6,
+        "name": "Refined Diamond",
+        "start": 0
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 11.2,
+        "name": "Refined Diamond",
+        "start": 5.6
+      },
+      {
+        "completed": false,
+        "duration": 21,
+        "end": 32.2,
+        "name": "Drill Motor",
+        "start": 11.2
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 40.6,
+        "name": "Refined Titanium",
+        "start": 32.2
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 44.8,
+        "name": "Golden Plate",
+        "start": 40.6
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 49,
+        "name": "Refined Mithril",
+        "start": 44.8
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 53.2,
+        "name": "Refined Mithril",
+        "start": 49
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 57.400000000000006,
+        "name": "Refined Mithril",
+        "start": 53.2
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 61.60000000000001,
+        "name": "Refined Mithril",
+        "start": 57.400000000000006
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 65.80000000000001,
+        "name": "Refined Mithril",
+        "start": 61.60000000000001
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 70.00000000000001,
+        "name": "Refined Mithril",
+        "start": 65.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 74.20000000000002,
+        "name": "Refined Mithril",
+        "start": 70.00000000000001
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 78.40000000000002,
+        "name": "Golden Plate",
+        "start": 74.20000000000002
+      },
+      {
+        "completed": false,
+        "duration": 12.6,
+        "end": 91.00000000000001,
+        "name": "Mithril Plate",
+        "start": 78.40000000000002
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 99.4,
+        "name": "Refined Titanium",
+        "start": 91.00000000000001
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 107.80000000000001,
+        "name": "Refined Titanium",
+        "start": 99.4
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 113.4,
+        "name": "Refined Diamond",
+        "start": 107.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 119,
+        "name": "Refined Diamond",
+        "start": 113.4
+      }
+    ],
+    [
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 5.6,
+        "name": "Refined Diamond",
+        "start": 0
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 11.2,
+        "name": "Refined Diamond",
+        "start": 5.6
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 19.599999999999998,
+        "name": "Refined Titanium",
+        "start": 11.2
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 27.999999999999996,
+        "name": "Refined Titanium",
+        "start": 19.599999999999998
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 36.39999999999999,
+        "name": "Refined Titanium",
+        "start": 27.999999999999996
+      },
+      {
+        "completed": false,
+        "duration": 7,
+        "end": 43.39999999999999,
+        "name": "Fuel Canister",
+        "start": 36.39999999999999
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 47.599999999999994,
+        "name": "Golden Plate",
+        "start": 43.39999999999999
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 51.8,
+        "name": "Refined Mithril",
+        "start": 47.599999999999994
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 56,
+        "name": "Refined Mithril",
+        "start": 51.8
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 60.2,
+        "name": "Refined Mithril",
+        "start": 56
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 64.4,
+        "name": "Refined Mithril",
+        "start": 60.2
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 68.60000000000001,
+        "name": "Refined Mithril",
+        "start": 64.4
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 72.80000000000001,
+        "name": "Refined Mithril",
+        "start": 68.60000000000001
+      },
+      {
+        "completed": false,
+        "duration": 4.199999999999999,
+        "end": 77.00000000000001,
+        "name": "Refined Mithril",
+        "start": 72.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 12.6,
+        "end": 89.60000000000001,
+        "name": "Mithril Plate",
+        "start": 77.00000000000001
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 98,
+        "name": "Refined Titanium",
+        "start": 89.60000000000001
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 106.4,
+        "name": "Refined Titanium",
+        "start": 98
+      },
+      {
+        "completed": false,
+        "duration": 8.399999999999999,
+        "end": 114.80000000000001,
+        "name": "Refined Titanium",
+        "start": 106.4
+      },
+      {
+        "completed": false,
+        "duration": 5.6,
+        "end": 120.4,
+        "name": "Refined Diamond",
+        "start": 114.80000000000001
+      },
+      {
+        "completed": false,
+        "duration": 2.8,
+        "end": 123.2,
+        "name": "Titanium Drill DR-X355",
+        "start": 120.4
+      }
+    ]
+  ],
+  "tips": [
+    "Refined materials have long wait times - start early",
+    "Drill Motors take 30 hours - perfect for overnight",
+    "Golden Plates need Refined Diamonds as dependency"
+  ],
+  "total_hours": 616
+}

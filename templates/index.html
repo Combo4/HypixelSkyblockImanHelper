@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛏️ Skyblock Forge Calculator 2026</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⛏️ Skyblock Forge Calculator 2026 ⛏️</h1>
+            <p class="subtitle">Optimize your Hypixel Skyblock forge progression</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Settings Panel -->
+            <section class="settings-panel">
+                <h2>Settings</h2>
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label for="forge-slots">Forge Slots:</label>
+                        <input type="number" id="forge-slots" min="1" max="10" value="5">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="quick-forge">
+                            Quick Forge Level 20 (30% off)
+                        </label>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="cole">
+                            Mayor Cole (25% off)
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Time Schedule Panel -->
+            <section class="settings-panel">
+                <h2>⏰ Time Schedule</h2>
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label for="start-time">Start Time:</label>
+                        <input type="time" id="start-time" value="20:00">
+                    </div>
+                    <div class="form-group">
+                        <label for="sleep-time">Sleep Time:</label>
+                        <input type="time" id="sleep-time" value="22:00">
+                    </div>
+                    <div class="form-group">
+                        <label for="wake-time">Wake Time:</label>
+                        <input type="time" id="wake-time" value="07:00">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="optimize-sleep" checked>
+                            Optimize for Sleep Schedule
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Item Selection Panel -->
+            <section class="selection-panel">
+                <h2>Item Selection</h2>
+                <div class="selection-grid">
+                    <div class="form-group">
+                        <label for="category">Category:</label>
+                        <select id="category">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="item">Item:</label>
+                        <select id="item">
+                            <option value="">-- Select Item --</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="action-buttons">
+                <button id="calculate-btn" class="btn btn-primary">🔨 Calculate</button>
+                <button id="save-btn" class="btn btn-success">💾 Save</button>
+                <button id="load-btn" class="btn btn-info">📂 Load</button>
+                <button id="reset-btn" class="btn btn-warning">🔄 Reset</button>
+            </section>
+
+            <!-- Tabs -->
+            <section class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="calendar">📅 Forge Calendar</button>
+                    <button class="tab-btn" data-tab="summary">📊 Summary</button>
+                </div>
+
+                <!-- Calendar Tab -->
+                <div id="calendar-tab" class="tab-content active">
+                    <div id="calendar-view">
+                        <p class="placeholder-text">No schedule generated yet. Select an item and click Calculate to begin.</p>
+                    </div>
+                </div>
+
+                <!-- Summary Tab -->
+                <div id="summary-tab" class="tab-content">
+                    <div id="summary-view">
+                        <p class="placeholder-text">Summary will appear here after calculation.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>Created for Hypixel Skyblock © 2026 | Localhost Version</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
