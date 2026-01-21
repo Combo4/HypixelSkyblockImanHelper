@@ -335,32 +335,33 @@ def calculate():
     days = int(parallel_hours // 24)
     hours = int(parallel_hours % 24)
     
-    # Calculate forge materials needed (all items that need forging)
+    # Get direct materials needed for the selected item (not recursive)
     forge_materials = {}
     
-    def collect_forge_items(item, count=1):
-        if isinstance(item, dict):
-            for sub_item, sub_qty in item.items():
-                collect_forge_items(sub_item, sub_qty * count)
-            return
-        
-        # Check if it's in DATA
-        for cat in DATA:
-            if item in DATA[cat]:
-                entry = DATA[cat][item]
-                if entry["time"] > 0.1:
-                    forge_materials[item] = forge_materials.get(item, 0) + count
-                collect_forge_items(entry["mats"], count)
-                return
-        
-        # Check if it's in COMPONENTS
-        if item in COMPONENTS:
-            comp = COMPONENTS[item]
-            if comp["time"] > 0:
-                forge_materials[item] = forge_materials.get(item, 0) + count
-            collect_forge_items(comp["mats"], count)
+    # Find the item's direct materials
+    entry = None
+    for cat in DATA:
+        if item_name in DATA[cat]:
+            entry = DATA[cat][item_name]
+            break
     
-    collect_forge_items(item_name)
+    if not entry and item_name in COMPONENTS:
+        entry = COMPONENTS[item_name]
+    
+    if entry and entry.get("mats"):
+        # Only include direct materials that need forging
+        for mat_name, mat_qty in entry["mats"].items():
+            # Check if this material needs forging
+            is_forgeable = False
+            for cat in DATA:
+                if mat_name in DATA[cat] and DATA[cat][mat_name].get("time", 0) > 0.1:
+                    is_forgeable = True
+                    break
+            if not is_forgeable and mat_name in COMPONENTS and COMPONENTS[mat_name].get("time", 0) > 0:
+                is_forgeable = True
+            
+            if is_forgeable:
+                forge_materials[mat_name] = mat_qty
     
     # Expand materials to show crafting chain
     expanded_materials = expand_materials_with_recipes(final_mats)
