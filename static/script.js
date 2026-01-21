@@ -1,21 +1,36 @@
 // Material Properties Database
 const MATERIAL_PROPERTIES = {
-    // Blocks
-    "Enchanted Diamond Block": { type: "block", blockStrength: 2500, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
-    "Enchanted Gold Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
-    "Enchanted Iron Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
-    "Enchanted Redstone Block": { type: "block", blockStrength: 2500, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
-    "Enchanted Coal Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 1 },
+    // Blocks (mining blocks drops their component items)
+    "Enchanted Diamond Block": { type: "block", blockStrength: 2500, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    "Enchanted Gold Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    "Enchanted Iron Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    "Enchanted Redstone Block": { type: "block", blockStrength: 2500, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    "Enchanted Coal Block": { type: "block", blockStrength: 2000, fortuneType: "block", spreadType: "mining", baseDrop: 10 },
+    
+    // Enchanted items (crafted, not mined - mark as non_mineable)
+    "Enchanted Diamond": { type: "non_mineable" },
+    "Enchanted Gold": { type: "non_mineable" },
+    "Enchanted Iron": { type: "non_mineable" },
+    "Enchanted Redstone": { type: "non_mineable" },
+    "Enchanted Coal": { type: "non_mineable" },
     
     // Dwarven Metals
     "Enchanted Mithril": { type: "dwarven_metal", blockStrength: 1500, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
     "Enchanted Titanium": { type: "dwarven_metal", blockStrength: 2000, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
     
-    // Ores (for future expansion)
+    // Ores and base materials
     "Coal": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
     "Iron Ore": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Iron Ingot": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
     "Gold Ore": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Gold Ingot": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
     "Diamond Ore": { type: "ore", blockStrength: 3000, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Diamond": { type: "ore", blockStrength: 3000, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Redstone": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    
+    // Dwarven base materials
+    "Mithril": { type: "dwarven_metal", blockStrength: 1500, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
+    "Titanium": { type: "dwarven_metal", blockStrength: 2000, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
     
     // Gemstones
     "Ruby": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
@@ -203,8 +218,7 @@ async function calculate() {
             pristine: document.getElementById('pristine').value,
             mining_spread: document.getElementById('mining-spread').value,
             gemstone_spread: document.getElementById('gemstone-spread').value,
-            efficiency: document.getElementById('efficiency').value,
-            ping: document.getElementById('ping').value
+            efficiency: document.getElementById('efficiency').value
         };
 
         currentData = { 
@@ -352,14 +366,21 @@ function renderSummary(data) {
     if (data.expanded_materials) {
         Object.entries(data.expanded_materials).sort().forEach(([item, info]) => {
             let chainText = '';
+            let multiplierText = '';
             if (info.chain && info.chain.length > 0) {
                 // Build chain string: "(320 Enchanted Diamonds → 51,200 Diamonds)"
                 const chainParts = info.chain.map(link => 
                     `${link.quantity.toLocaleString()} ${link.material}${link.quantity > 1 ? 's' : ''}`
                 );
                 chainText = ` <span style="color: #888;">(→ ${chainParts.join(' → ')})</span>`;
+                
+                // Calculate total multiplier (multiply all multipliers in chain, then by quantity)
+                const totalMultiplier = info.chain.reduce((product, link) => product * link.multiplier, 1) * info.quantity;
+                if (totalMultiplier > 1) {
+                    multiplierText = ` <span style="color: #ffaa00;">(x${totalMultiplier.toLocaleString()})</span>`;
+                }
             }
-            html += `<li>• ${item}: <strong>${info.quantity.toLocaleString()}</strong>${chainText}</li>`;
+            html += `<li>• ${item}: <strong>${info.quantity.toLocaleString()}</strong>${multiplierText}${chainText}</li>`;
         });
     } else {
         // Fallback to simple materials
@@ -386,7 +407,11 @@ function renderSummary(data) {
                 const deepest = info.chain[info.chain.length - 1];
                 materialsForMining[deepest.material] = (materialsForMining[deepest.material] || 0) + deepest.quantity;
             } else {
-                materialsForMining[item] = info.quantity;
+                // No chain, check if it's mineable
+                const props = MATERIAL_PROPERTIES[item];
+                if (props && props.type !== 'non_mineable') {
+                    materialsForMining[item] = info.quantity;
+                }
             }
         }
         const miningData = calculateMiningBreakdown(materialsForMining);
@@ -414,7 +439,7 @@ function renderSummary(data) {
 
     html += `</ul></div>`;
 
-    // Add Mining Breakdown Section (use deepest material from expanded chain)
+    // Add Mining Breakdown Section (use deepest raw materials like the summary)
     let materialsForMining = {};
     if (data.expanded_materials) {
         // Use the deepest (most raw) material in each chain for mining calculation
@@ -424,8 +449,11 @@ function renderSummary(data) {
                 const deepest = info.chain[info.chain.length - 1];
                 materialsForMining[deepest.material] = (materialsForMining[deepest.material] || 0) + deepest.quantity;
             } else {
-                // No chain, use the material itself
-                materialsForMining[item] = info.quantity;
+                // No chain, use the material itself if it's mineable
+                const props = MATERIAL_PROPERTIES[item];
+                if (props && props.type !== 'non_mineable') {
+                    materialsForMining[item] = info.quantity;
+                }
             }
         }
     } else {
@@ -445,8 +473,8 @@ function renderSummary(data) {
             <table style="width: 100%; border-collapse: collapse; color: #ccc;">
                 <thead>
                     <tr style="border-bottom: 2px solid #ff6600; text-align: left;">
-                        <th style="padding: 8px;">Material</th>
-                        <th style="padding: 8px;">Quantity</th>
+                        <th style="padding: 8px;">Raw Material</th>
+                        <th style="padding: 8px;">Raw Quantity Needed</th>
                         <th style="padding: 8px;">Fortune Type</th>
                         <th style="padding: 8px;">Blocks Needed</th>
                         <th style="padding: 8px;">Time</th>
@@ -534,7 +562,6 @@ function autoLoadFromBrowser() {
                 if (data.mining_stats.mining_spread) document.getElementById('mining-spread').value = data.mining_stats.mining_spread;
                 if (data.mining_stats.gemstone_spread) document.getElementById('gemstone-spread').value = data.mining_stats.gemstone_spread;
                 if (data.mining_stats.efficiency) document.getElementById('efficiency').value = data.mining_stats.efficiency;
-                if (data.mining_stats.ping) document.getElementById('ping').value = data.mining_stats.ping;
             }
             
             // Restore item after category is set
@@ -687,7 +714,6 @@ function calculateMiningTime() {
     const miningSpread = parseFloat(document.getElementById('mining-spread').value) || 0;
     const gemstoneSpread = parseFloat(document.getElementById('gemstone-spread').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) / 100;
-    const ping = parseFloat(document.getElementById('ping').value);
     const targetQuantity = parseFloat(document.getElementById('target-quantity').value);
 
     if (!materialSelect || !miningSpeed) {
@@ -727,8 +753,8 @@ function calculateMiningTime() {
     // Softcap: minimum 4 ticks
     if (ticks < 4) ticks = 4;
     
-    // Convert to seconds (1 tick = 0.05s) and add ping delay
-    const breakTimeSeconds = (ticks * 0.05) + (ping / 1000);
+    // Convert to seconds (1 tick = 0.05s)
+    const breakTimeSeconds = ticks * 0.05;
 
     // Calculate spread multiplier
     let spreadMultiplier = 1;
@@ -782,7 +808,7 @@ function calculateMiningTime() {
 
     // Display results
     const spreadInfo = spreadMultiplier > 1 ? ` (×${spreadMultiplier.toFixed(2)} spread)` : '';
-    document.getElementById('break-ticks').textContent = `${ticks} ticks (${(ticks * 0.05).toFixed(2)}s + ${ping}ms ping)`;
+    document.getElementById('break-ticks').textContent = `${ticks} ticks (${(ticks * 0.05).toFixed(2)}s)`;
     document.getElementById('drops-per-block').textContent = `${dropsPerBlock.toFixed(2)}${spreadInfo}`;
     document.getElementById('blocks-needed').textContent = blocksNeeded.toLocaleString();
     document.getElementById('blocks-per-hour').textContent = Math.floor(blocksPerHourActual).toLocaleString();
@@ -804,7 +830,6 @@ function calculateMiningBreakdown(materials) {
     const miningSpread = parseFloat(document.getElementById('mining-spread').value) || 0;
     const gemstoneSpread = parseFloat(document.getElementById('gemstone-spread').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) / 100 || 0.5;
-    const ping = parseFloat(document.getElementById('ping').value) || 50;
 
     const breakdown = [];
     let totalMinutes = 0;
@@ -838,7 +863,7 @@ function calculateMiningBreakdown(materials) {
         // Calculate mining time in ticks
         let ticks = Math.floor((props.blockStrength * 30) / miningSpeed);
         if (ticks < 4) ticks = 4;
-        const breakTimeSeconds = (ticks * 0.05) + (ping / 1000);
+        const breakTimeSeconds = ticks * 0.05;
 
         // Calculate spread multiplier
         let spreadMultiplier = 1;

@@ -66,7 +66,7 @@ def generate_forge_schedule(item_name, slots, total_mult, start_time=None, sleep
         if not entry and item in COMPONENTS:
             entry = COMPONENTS[item]
         
-        if entry and entry.get("time", 0) > 0.1:
+        if entry and entry.get("time", 0) > 0:
             # Track dependencies
             if item not in task_dependencies:
                 task_dependencies[item] = []
@@ -91,7 +91,7 @@ def generate_forge_schedule(item_name, slots, total_mult, start_time=None, sleep
     def is_forgeable(item_name):
         """Check if an item requires forging"""
         for cat in DATA:
-            if item_name in DATA[cat] and DATA[cat][item_name].get("time", 0) > 0.1:
+            if item_name in DATA[cat] and DATA[cat][item_name].get("time", 0) > 0:
                 return True
         if item_name in COMPONENTS and COMPONENTS[item_name].get("time", 0) > 0:
             return True
@@ -256,9 +256,9 @@ def expand_materials_with_recipes(materials):
             while current_mat in CRAFTING_RECIPES:
                 recipe_data = CRAFTING_RECIPES[current_mat]
                 next_mat = list(recipe_data['recipe'].keys())[0]
-                next_qty = list(recipe_data['recipe'].values())[0]
-                current_qty *= next_qty
-                chain.append({"material": next_mat, "quantity": current_qty})
+                multiplier = list(recipe_data['recipe'].values())[0]
+                current_qty *= multiplier
+                chain.append({"material": next_mat, "quantity": current_qty, "multiplier": multiplier})
                 current_mat = next_mat
             
             expanded[mat_name] = {
@@ -354,7 +354,7 @@ def calculate():
             # Check if this material needs forging
             is_forgeable = False
             for cat in DATA:
-                if mat_name in DATA[cat] and DATA[cat][mat_name].get("time", 0) > 0.1:
+                if mat_name in DATA[cat] and DATA[cat][mat_name].get("time", 0) > 0:
                     is_forgeable = True
                     break
             if not is_forgeable and mat_name in COMPONENTS and COMPONENTS[mat_name].get("time", 0) > 0:
