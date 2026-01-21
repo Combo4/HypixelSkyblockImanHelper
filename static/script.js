@@ -862,7 +862,7 @@ function calculateMiningTime() {
     }
 
     // Display results
-    const spreadInfo = spreadMultiplier > 1 ? ` (×${spreadMultiplier.toFixed(2)} spread)` : '';
+    const spreadInfo = spreadMultiplier > 1 ? ` (×${spreadMultiplier} spread)` : '';
     document.getElementById('break-ticks').textContent = `${ticks} ticks (${(ticks / 20).toFixed(3)}s)`;
     document.getElementById('drops-per-block').textContent = `${dropsPerBlock.toFixed(2)}${spreadInfo}`;
     document.getElementById('blocks-needed').textContent = blocksNeeded.toLocaleString();
@@ -870,7 +870,37 @@ function calculateMiningTime() {
     document.getElementById('mining-time').textContent = timeEstimate;
     document.getElementById('mining-results').style.display = 'block';
 
-    showToast('Mining time calculated!');
+    // Add Mithril variant recommendation if applicable
+    if (materialSelect.includes('mithril')) {
+        const mithrilVariants = [
+            { name: 'Gray Mithril', blockStrength: 500, baseDrop: 1 },
+            { name: 'Prismarine Mithril', blockStrength: 800, baseDrop: 2 },
+            { name: 'Blue Wool Mithril', blockStrength: 1500, baseDrop: 5 }
+        ];
+        
+        let bestVariant = null;
+        let bestItemsPerHour = 0;
+        
+        for (const variant of mithrilVariants) {
+            const variantTicks = Math.round((variant.blockStrength * 30) / miningSpeed);
+            const finalTicks = variantTicks < 4 ? 4 : variantTicks;
+            const variantBlocksPerHour = (3600 / (finalTicks / 20)) * spreadMultiplier * efficiency;
+            const fortuneMultiplier = 1 + (totalFortune / 100);
+            const variantDropsPerBlock = variant.baseDrop * fortuneMultiplier;
+            const variantItemsPerHour = variantBlocksPerHour * variantDropsPerBlock;
+            
+            if (variantItemsPerHour > bestItemsPerHour) {
+                bestItemsPerHour = variantItemsPerHour;
+                bestVariant = variant;
+            }
+        }
+        
+        if (bestVariant) {
+            showToast(`💡 Best variant: ${bestVariant.name} (${Math.floor(bestItemsPerHour).toLocaleString()} items/hour)`, 'success');
+        }
+    } else {
+        showToast('Mining time calculated!');
+    }
 }
 
 // Calculate mining breakdown for all raw materials
