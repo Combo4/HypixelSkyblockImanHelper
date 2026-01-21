@@ -729,8 +729,7 @@ function calculateMiningTime() {
     const gemstoneFortune = parseFloat(document.getElementById('gemstone-fortune').value) || 0;
     const pristine = parseFloat(document.getElementById('pristine').value) || 0;
     const miningSpread = parseFloat(document.getElementById('mining-spread').value) || 0;
-    const oreSpread = parseFloat(document.getElementById('ore-spread').value) || 0;
-    const blockSpread = parseFloat(document.getElementById('block-spread').value) || 0;
+    const oreBlockSpread = parseFloat(document.getElementById('ore-spread').value) || 0;
     const gemstoneSpread = parseFloat(document.getElementById('gemstone-spread').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) / 100;
     const targetQuantity = parseFloat(document.getElementById('target-quantity').value);
@@ -763,13 +762,13 @@ function calculateMiningTime() {
         applyPristine = true;
     } else if (isDwarvenMetal) {
         totalFortune += dwarvenFortune;
-        totalSpread += oreSpread;
+        totalSpread += oreBlockSpread;
     } else if (isOre) {
         totalFortune += oreFortune;
-        totalSpread += oreSpread;
+        totalSpread += oreBlockSpread;
     } else if (isBlock) {
         totalFortune += blockFortune;
-        totalSpread += blockSpread;
+        totalSpread += oreBlockSpread;
     }
 
     // STEP 2: Calculate break speed (blocks broken per second based on mining speed)
@@ -854,8 +853,7 @@ function calculateMiningBreakdown(materials) {
     const gemstoneFortune = parseFloat(document.getElementById('gemstone-fortune').value) || 0;
     const pristine = parseFloat(document.getElementById('pristine').value) || 0;
     const miningSpread = parseFloat(document.getElementById('mining-spread').value) || 0;
-    const oreSpread = parseFloat(document.getElementById('ore-spread').value) || 0;
-    const blockSpread = parseFloat(document.getElementById('block-spread').value) || 0;
+    const oreBlockSpread = parseFloat(document.getElementById('ore-spread').value) || 0;
     const gemstoneSpread = parseFloat(document.getElementById('gemstone-spread').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) / 100 || 0.5;
 
@@ -888,13 +886,13 @@ function calculateMiningBreakdown(materials) {
             applyPristine = true;
         } else if (props.fortuneType === 'dwarven_metal') {
             totalFortune += dwarvenFortune;
-            totalSpread += oreSpread;
+            totalSpread += oreBlockSpread;
         } else if (props.fortuneType === 'ore') {
             totalFortune += oreFortune;
-            totalSpread += oreSpread;
+            totalSpread += oreBlockSpread;
         } else if (props.fortuneType === 'block') {
             totalFortune += blockFortune;
-            totalSpread += blockSpread;
+            totalSpread += oreBlockSpread;
         }
 
         // STEP 2: Calculate break speed (blocks per hour based on block strength and mining speed)
@@ -987,7 +985,6 @@ function getMiningStats() {
         pristine: document.getElementById('pristine').value,
         mining_spread: document.getElementById('mining-spread').value,
         ore_spread: document.getElementById('ore-spread').value,
-        block_spread: document.getElementById('block-spread').value,
         gemstone_spread: document.getElementById('gemstone-spread').value,
         efficiency: document.getElementById('efficiency').value
     };
@@ -1003,7 +1000,6 @@ function setMiningStats(stats) {
     if (stats.pristine) document.getElementById('pristine').value = stats.pristine;
     if (stats.mining_spread) document.getElementById('mining-spread').value = stats.mining_spread;
     if (stats.ore_spread) document.getElementById('ore-spread').value = stats.ore_spread;
-    if (stats.block_spread) document.getElementById('block-spread').value = stats.block_spread;
     if (stats.gemstone_spread) document.getElementById('gemstone-spread').value = stats.gemstone_spread;
     if (stats.efficiency) document.getElementById('efficiency').value = stats.efficiency;
 }
