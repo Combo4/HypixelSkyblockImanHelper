@@ -66,6 +66,10 @@ const MATERIAL_PROPERTIES = {
 // Global state
 let currentSchedule = null;
 let currentData = null;
+let miningProfiles = {
+    fortune: null,
+    spread: null
+};
 
 // DOM Elements
 const categorySelect = document.getElementById('category');
@@ -90,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCategories();
     setupEventListeners();
     setCurrentTime();
+    loadMiningProfilesFromStorage();
     autoLoadFromBrowser();
 });
 
@@ -121,6 +126,11 @@ function setupEventListeners() {
     
     // Mining calculator button
     document.getElementById('calculate-mining-btn').addEventListener('click', calculateMiningTime);
+    
+    // Profile management buttons
+    document.getElementById('save-profile-btn').addEventListener('click', saveMiningProfile);
+    document.getElementById('load-profile-btn').addEventListener('click', loadMiningProfile);
+    document.getElementById('mining-profile').addEventListener('change', onProfileChange);
 }
 
 // Tab Switching
@@ -940,6 +950,98 @@ function calculateMiningBreakdown(materials) {
     }
 
     return { breakdown, totalTime: totalTimeStr, totalMinutes };
+}
+
+// Mining Profile Management
+function getMiningStats() {
+    return {
+        mining_speed: document.getElementById('mining-speed').value,
+        base_fortune: document.getElementById('base-fortune').value,
+        block_fortune: document.getElementById('block-fortune').value,
+        ore_fortune: document.getElementById('ore-fortune').value,
+        dwarven_fortune: document.getElementById('dwarven-fortune').value,
+        gemstone_fortune: document.getElementById('gemstone-fortune').value,
+        pristine: document.getElementById('pristine').value,
+        mining_spread: document.getElementById('mining-spread').value,
+        gemstone_spread: document.getElementById('gemstone-spread').value,
+        efficiency: document.getElementById('efficiency').value
+    };
+}
+
+function setMiningStats(stats) {
+    if (stats.mining_speed) document.getElementById('mining-speed').value = stats.mining_speed;
+    if (stats.base_fortune) document.getElementById('base-fortune').value = stats.base_fortune;
+    if (stats.block_fortune) document.getElementById('block-fortune').value = stats.block_fortune;
+    if (stats.ore_fortune) document.getElementById('ore-fortune').value = stats.ore_fortune;
+    if (stats.dwarven_fortune) document.getElementById('dwarven-fortune').value = stats.dwarven_fortune;
+    if (stats.gemstone_fortune) document.getElementById('gemstone-fortune').value = stats.gemstone_fortune;
+    if (stats.pristine) document.getElementById('pristine').value = stats.pristine;
+    if (stats.mining_spread) document.getElementById('mining-spread').value = stats.mining_spread;
+    if (stats.gemstone_spread) document.getElementById('gemstone-spread').value = stats.gemstone_spread;
+    if (stats.efficiency) document.getElementById('efficiency').value = stats.efficiency;
+}
+
+function saveMiningProfile() {
+    const profileSelect = document.getElementById('mining-profile');
+    const profileType = profileSelect.value;
+    
+    if (profileType === 'current') {
+        showToast('Select "Fortune Setup" or "Spread Setup" to save', 'error');
+        return;
+    }
+    
+    const stats = getMiningStats();
+    miningProfiles[profileType] = stats;
+    
+    // Save to localStorage
+    localStorage.setItem('miningProfiles', JSON.stringify(miningProfiles));
+    
+    showToast(`${profileType.charAt(0).toUpperCase() + profileType.slice(1)} profile saved!`);
+}
+
+function loadMiningProfile() {
+    const profileSelect = document.getElementById('mining-profile');
+    const profileType = profileSelect.value;
+    
+    if (profileType === 'current') {
+        showToast('Select a profile to load', 'error');
+        return;
+    }
+    
+    const profile = miningProfiles[profileType];
+    if (!profile) {
+        showToast(`No ${profileType} profile saved`, 'error');
+        return;
+    }
+    
+    setMiningStats(profile);
+    showToast(`${profileType.charAt(0).toUpperCase() + profileType.slice(1)} profile loaded!`);
+}
+
+function onProfileChange() {
+    const profileSelect = document.getElementById('mining-profile');
+    const profileType = profileSelect.value;
+    
+    if (profileType !== 'current') {
+        if (miningProfiles[profileType]) {
+            setMiningStats(miningProfiles[profileType]);
+            showToast(`Switched to ${profileType} profile`);
+        } else {
+            showToast(`No ${profileType} profile saved. Please save one first.`, 'error');
+        }
+    }
+}
+
+// Load profiles from localStorage on page load
+function loadMiningProfilesFromStorage() {
+    try {
+        const saved = localStorage.getItem('miningProfiles');
+        if (saved) {
+            miningProfiles = JSON.parse(saved);
+        }
+    } catch (error) {
+        console.error('Failed to load mining profiles:', error);
+    }
 }
 
 // Show Toast Notification

@@ -117,6 +117,21 @@
                         <h2>⛏️ Mining Time Estimator</h2>
                         <p class="subtitle" style="color: #999; margin-bottom: 20px;">Calculate how long it takes to mine materials</p>
 
+                        <!-- Profile Selection -->
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="mining-profile">Mining Profile:</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select id="mining-profile" style="flex: 1;">
+                                    <option value="current">Current Settings</option>
+                                    <option value="fortune">Fortune Setup</option>
+                                    <option value="spread">Spread Setup</option>
+                                </select>
+                                <button id="save-profile-btn" class="btn btn-success" style="padding: 10px 20px;">💾 Save Profile</button>
+                                <button id="load-profile-btn" class="btn btn-info" style="padding: 10px 20px;">📂 Load Profile</button>
+                            </div>
+                            <small style="color: #888;">Select a profile to use for mining calculations</small>
+                        </div>
+
                         <div class="mining-inputs">
                             <div class="form-group">
                                 <label for="material-select">Material:</label>
