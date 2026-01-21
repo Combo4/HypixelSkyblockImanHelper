@@ -18,7 +18,14 @@ const MATERIAL_PROPERTIES = {
     "Enchanted Mithril": { type: "dwarven_metal", blockStrength: 1500, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
     "Enchanted Titanium": { type: "dwarven_metal", blockStrength: 2000, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
     
-    // Ores and base materials
+    // Vanilla blocks (drop 9 of their base item when mined)
+    "Coal Block": { type: "block", blockStrength: 600, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    "Iron Block": { type: "block", blockStrength: 1500, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    "Gold Block": { type: "block", blockStrength: 1500, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    "Diamond Block": { type: "block", blockStrength: 3000, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    "Redstone Block": { type: "block", blockStrength: 1500, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
+    
+    // Ores and base materials (drop 1 item when mined)
     "Coal": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
     "Iron Ore": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
     "Iron Ingot": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
@@ -835,7 +842,14 @@ function calculateMiningBreakdown(materials) {
     let totalMinutes = 0;
 
     for (const [materialName, quantity] of Object.entries(materials)) {
-        const props = MATERIAL_PROPERTIES[materialName];
+        // Auto-select block variant if it exists (e.g., Coal -> Coal Block)
+        let actualMaterial = materialName;
+        const blockVariant = materialName + " Block";
+        if (MATERIAL_PROPERTIES[blockVariant] && MATERIAL_PROPERTIES[blockVariant].type === 'block') {
+            actualMaterial = blockVariant;
+        }
+        
+        const props = MATERIAL_PROPERTIES[actualMaterial];
         
         // Skip non-mineable materials
         if (!props || props.type === 'non_mineable') {
@@ -905,7 +919,7 @@ function calculateMiningBreakdown(materials) {
         }
 
         breakdown.push({
-            material: materialName,
+            material: actualMaterial,
             quantity: quantity,
             fortuneType: props.fortuneType,
             blocksNeeded: blocksNeeded,
