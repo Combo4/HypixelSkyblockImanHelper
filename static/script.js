@@ -35,8 +35,8 @@ const MATERIAL_PROPERTIES = {
     "Diamond": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 5 },
     "Redstone": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 10 },
     
-    // Dwarven base materials
-    "Mithril": { type: "dwarven_metal", blockStrength: 800, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
+    // Dwarven base materials (Mithril has 3 variants: Gray=500/1, Prismarine=800/2, Blue Wool=1500/5)
+    "Mithril": { type: "dwarven_metal", blockStrength: 800, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 2 },
     "Titanium": { type: "dwarven_metal", blockStrength: 2000, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
     
     // Gemstones
