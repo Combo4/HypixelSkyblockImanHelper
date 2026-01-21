@@ -225,6 +225,54 @@ def get_items(category):
         return jsonify(list(DATA[category].keys()))
     return jsonify([])
 
+# Crafting recipes for expanding materials
+CRAFTING_RECIPES = {
+    "Enchanted Diamond Block": {"recipe": {"Enchanted Diamond": 160}, "crafted": True},
+    "Enchanted Diamond": {"recipe": {"Diamond": 160}, "crafted": True},
+    "Enchanted Gold Block": {"recipe": {"Enchanted Gold": 160}, "crafted": True},
+    "Enchanted Gold": {"recipe": {"Gold Ingot": 160}, "crafted": True},
+    "Enchanted Iron Block": {"recipe": {"Enchanted Iron": 160}, "crafted": True},
+    "Enchanted Iron": {"recipe": {"Iron Ingot": 160}, "crafted": True},
+    "Enchanted Redstone Block": {"recipe": {"Enchanted Redstone": 160}, "crafted": True},
+    "Enchanted Redstone": {"recipe": {"Redstone": 160}, "crafted": True},
+    "Enchanted Coal Block": {"recipe": {"Enchanted Coal": 160}, "crafted": True},
+    "Enchanted Coal": {"recipe": {"Coal": 160}, "crafted": True},
+    "Enchanted Mithril": {"recipe": {"Mithril": 160}, "crafted": True},
+    "Enchanted Titanium": {"recipe": {"Titanium": 160}, "crafted": True},
+}
+
+def expand_materials_with_recipes(materials):
+    """Expand materials to show crafting chain (e.g., Enchanted Diamond Block -> Enchanted Diamond -> Diamond)"""
+    expanded = {}
+    
+    for mat_name, qty in materials.items():
+        if mat_name in CRAFTING_RECIPES:
+            recipe = CRAFTING_RECIPES[mat_name]
+            # Store material with its recipe chain
+            chain = []
+            current_mat = mat_name
+            current_qty = qty
+            
+            while current_mat in CRAFTING_RECIPES:
+                recipe_data = CRAFTING_RECIPES[current_mat]
+                next_mat = list(recipe_data['recipe'].keys())[0]
+                next_qty = list(recipe_data['recipe'].values())[0]
+                current_qty *= next_qty
+                chain.append({"material": next_mat, "quantity": current_qty})
+                current_mat = next_mat
+            
+            expanded[mat_name] = {
+                "quantity": qty,
+                "chain": chain
+            }
+        else:
+            expanded[mat_name] = {
+                "quantity": qty,
+                "chain": []
+            }
+    
+    return expanded
+
 @app.route('/api/calculate', methods=['POST'])
 def calculate():
     data = request.json
@@ -314,9 +362,13 @@ def calculate():
     
     collect_forge_items(item_name)
     
+    # Expand materials to show crafting chain
+    expanded_materials = expand_materials_with_recipes(final_mats)
+    
     return jsonify({
         'schedule': schedule,
         'materials': final_mats,
+        'expanded_materials': expanded_materials,
         'forge_materials': forge_materials,
         'total_hours': round(total_man_hours, 1),
         'calendar_days': days,

@@ -348,9 +348,25 @@ function renderSummary(data) {
             <h3>📦 Raw Materials Needed</h3>
             <ul class="materials-list">`;
 
-    Object.entries(data.materials).sort().forEach(([item, qty]) => {
-        html += `<li>• ${item}: <strong>${qty.toLocaleString()}</strong></li>`;
-    });
+    // Use expanded materials if available
+    if (data.expanded_materials) {
+        Object.entries(data.expanded_materials).sort().forEach(([item, info]) => {
+            let chainText = '';
+            if (info.chain && info.chain.length > 0) {
+                // Build chain string: "(320 Enchanted Diamonds → 51,200 Diamonds)"
+                const chainParts = info.chain.map(link => 
+                    `${link.quantity.toLocaleString()} ${link.material}${link.quantity > 1 ? 's' : ''}`
+                );
+                chainText = ` <span style="color: #888;">(→ ${chainParts.join(' → ')})</span>`;
+            }
+            html += `<li>• ${item}: <strong>${info.quantity.toLocaleString()}</strong>${chainText}</li>`;
+        });
+    } else {
+        // Fallback to simple materials
+        Object.entries(data.materials).sort().forEach(([item, qty]) => {
+            html += `<li>• ${item}: <strong>${qty.toLocaleString()}</strong></li>`;
+        });
+    }
 
     html += `</ul>
         </div>
@@ -358,8 +374,29 @@ function renderSummary(data) {
         <div class="summary-section">
             <h3>⏰ Time Estimate</h3>
             <div class="time-info">
-                <p>Total Man-Hours: <strong>${data.total_hours}h</strong></p>
-                <p>Calendar Time (${currentData.slots} slots): <strong>${data.calendar_days}d ${data.calendar_hours}h</strong></p>
+                <p><strong>Forge Time:</strong></p>
+                <p style="margin-left: 20px;">• Total Man-Hours: <strong>${data.total_hours}h</strong></p>
+                <p style="margin-left: 20px;">• Calendar Time (${currentData.slots} slots): <strong>${data.calendar_days}d ${data.calendar_hours}h</strong></p>`;
+    
+    // Add mining time if available
+    if (data.expanded_materials) {
+        let materialsForMining = {};
+        for (const [item, info] of Object.entries(data.expanded_materials)) {
+            if (info.chain && info.chain.length > 0) {
+                const deepest = info.chain[info.chain.length - 1];
+                materialsForMining[deepest.material] = (materialsForMining[deepest.material] || 0) + deepest.quantity;
+            } else {
+                materialsForMining[item] = info.quantity;
+            }
+        }
+        const miningData = calculateMiningBreakdown(materialsForMining);
+        if (miningData.breakdown.length > 0) {
+            html += `
+                <p style="margin-top: 15px;"><strong>Resource Gathering Time:</strong> <span style="color: #ff6600;">${miningData.totalTime}</span></p>`;
+        }
+    }
+    
+    html += `
             </div>
         </div>
 
@@ -377,13 +414,31 @@ function renderSummary(data) {
 
     html += `</ul></div>`;
 
-    // Add Mining Breakdown Section
-    const miningData = calculateMiningBreakdown(data.materials);
+    // Add Mining Breakdown Section (use deepest material from expanded chain)
+    let materialsForMining = {};
+    if (data.expanded_materials) {
+        // Use the deepest (most raw) material in each chain for mining calculation
+        for (const [item, info] of Object.entries(data.expanded_materials)) {
+            if (info.chain && info.chain.length > 0) {
+                // Use the last item in chain (most raw)
+                const deepest = info.chain[info.chain.length - 1];
+                materialsForMining[deepest.material] = (materialsForMining[deepest.material] || 0) + deepest.quantity;
+            } else {
+                // No chain, use the material itself
+                materialsForMining[item] = info.quantity;
+            }
+        }
+    } else {
+        materialsForMining = data.materials;
+    }
+    
+    const miningData = calculateMiningBreakdown(materialsForMining);
     
     if (miningData.breakdown.length > 0) {
         html += `
         <div class="summary-section">
-            <h3>⛏️ Mining Requirements</h3>
+            <h3>⛏️ Resource Gathering Breakdown</h3>
+            <p style="color: #999; font-size: 0.9em; margin-bottom: 10px;">Mining time for base materials (deepest in crafting chain)</p>
             <p style="color: #ff6600; font-size: 1.2em; margin-bottom: 15px;">
                 Total Mining Time: <strong>${miningData.totalTime}</strong>
             </p>
