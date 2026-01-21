@@ -740,88 +740,83 @@ function calculateMiningTime() {
         return;
     }
 
-    // Extract block strength from material value
+    // STEP 1: Identify block type and extract properties
     const blockStrength = parseFloat(materialSelect.split('-')[1]);
     const isGemstone = materialSelect.includes('ruby') || materialSelect.includes('sapphire') || 
                        materialSelect.includes('jade') || materialSelect.includes('amethyst') || 
                        materialSelect.includes('amber') || materialSelect.includes('topaz') || 
                        materialSelect.includes('jasper');
+    const isDwarvenMetal = materialSelect.includes('mithril') || materialSelect.includes('titanium');
+    const isBlock = materialSelect.includes('coal-') || materialSelect.includes('iron-') || 
+                    materialSelect.includes('gold-') || materialSelect.includes('diamond-') ||
+                    materialSelect.includes('redstone-') || materialSelect.includes('hardstone');
+    const isOre = !isGemstone && !isBlock && !isDwarvenMetal;
 
-    // Determine fortune type and spread value (mining_spread + specific spread)
+    // Determine fortune, spread, and pristine applicability
     let totalFortune = baseFortune;
-    let spreadValue = miningSpread; // Base mining spread applies to all
+    let totalSpread = miningSpread; // Base mining spread
+    let applyPristine = false;
     
     if (isGemstone) {
         totalFortune += gemstoneFortune;
-        spreadValue += gemstoneSpread; // Gemstone spread is added on top
-    } else if (materialSelect.includes('mithril') || materialSelect.includes('titanium')) {
+        totalSpread += gemstoneSpread;
+        applyPristine = true;
+    } else if (isDwarvenMetal) {
         totalFortune += dwarvenFortune;
-        spreadValue += oreSpread; // Dwarven metals use ore spread on top
-    } else if (materialSelect.includes('coal') || materialSelect.includes('iron') || 
-               materialSelect.includes('gold') || materialSelect.includes('diamond') ||
-               materialSelect.includes('redstone')) {
-        // Check if it's a block or ore
-        if (materialSelect.includes('coal-') || materialSelect.includes('iron-') || 
-            materialSelect.includes('gold-') || materialSelect.includes('diamond-') ||
-            materialSelect.includes('redstone-')) {
-            // It's a block (has block strength in name)
-            totalFortune += blockFortune;
-            spreadValue += blockSpread;
-        } else {
-            // It's an ore
-            totalFortune += oreFortune;
-            spreadValue += oreSpread;
-        }
-    } else {
-        // Default to block (e.g., hardstone)
+        totalSpread += oreSpread;
+    } else if (isOre) {
+        totalFortune += oreFortune;
+        totalSpread += oreSpread;
+    } else if (isBlock) {
         totalFortune += blockFortune;
-        spreadValue += blockSpread;
+        totalSpread += blockSpread;
     }
 
-    // Calculate mining time in ticks (rounded to nearest integer per wiki)
+    // STEP 2: Calculate break speed (blocks broken per second based on mining speed)
     let ticks = Math.round((blockStrength * 30) / miningSpeed);
-    
-    // Softcap: minimum 4 ticks
-    if (ticks < 4) ticks = 4;
-    
-    // Convert to seconds (divide by 20 per wiki formula)
+    if (ticks < 4) ticks = 4; // Softcap: minimum 4 ticks
     const breakTimeSeconds = ticks / 20;
+    const blocksPerSecond = 1 / breakTimeSeconds;
+    const blocksPerHourBase = blocksPerSecond * 3600;
 
-    // Calculate spread multiplier
+    // STEP 3: Apply spread (increases effective blocks broken)
     let spreadMultiplier = 1;
-    if (spreadValue > 0) {
-        const guaranteedBlocks = Math.floor(spreadValue / 100);
-        const chancePercent = spreadValue % 100;
+    if (totalSpread > 0) {
+        const guaranteedBlocks = Math.floor(totalSpread / 100);
+        const chancePercent = totalSpread % 100;
         spreadMultiplier = 1 + guaranteedBlocks + (chancePercent / 100);
     }
+    const blocksPerHourWithSpread = blocksPerHourBase * spreadMultiplier;
 
-    // Calculate drops per block
+    // STEP 4: Apply fortune to calculate drops per block
     let dropsPerBlock;
     if (isGemstone) {
-        // Base gemstone drops: 3-5, average = 4
-        const baseDrop = 4;
-        
-        // Mining fortune multiplier
+        const baseDrop = 4; // Gemstones drop 3-5, average = 4
         const fortuneMultiplier = 1 + (totalFortune / 100);
-        
-        // Rough gemstones from fortune
         const roughGems = baseDrop * fortuneMultiplier;
         
-        // Pristine bonus: each rough gem has pristine% chance to become flawed
-        const pristineBonus = pristine / 100 * 0.79;
-        dropsPerBlock = roughGems * (1 + pristineBonus) * spreadMultiplier;
+        // Apply pristine if applicable
+        if (applyPristine && pristine > 0) {
+            const pristineBonus = pristine / 100 * 0.79;
+            dropsPerBlock = roughGems * (1 + pristineBonus);
+        } else {
+            dropsPerBlock = roughGems;
+        }
     } else {
-        // Non-gemstone: simple fortune multiplication
         const baseDrop = 1;
-        dropsPerBlock = baseDrop * (1 + (totalFortune / 100)) * spreadMultiplier;
+        const fortuneMultiplier = 1 + (totalFortune / 100);
+        dropsPerBlock = baseDrop * fortuneMultiplier;
     }
 
-    // Calculate blocks needed
-    const blocksNeeded = Math.ceil(targetQuantity / dropsPerBlock);
+    // Calculate items per hour (blocks * spread * drops)
+    const itemsPerHourTheoretical = blocksPerHourWithSpread * dropsPerBlock;
 
-    // Calculate blocks per hour with efficiency
-    const blocksPerHourTheoretical = 3600 / breakTimeSeconds;
-    const blocksPerHourActual = blocksPerHourTheoretical * efficiency;
+    // STEP 5: Apply efficiency (human mining efficiency)
+    const itemsPerHourActual = itemsPerHourTheoretical * efficiency;
+    const blocksPerHourActual = blocksPerHourWithSpread * efficiency;
+
+    // Calculate blocks needed and time
+    const blocksNeeded = Math.ceil(targetQuantity / dropsPerBlock);
 
     // Calculate time needed
     const hoursNeeded = blocksNeeded / blocksPerHourActual;
@@ -882,53 +877,65 @@ function calculateMiningBreakdown(materials) {
             continue;
         }
 
-        // Determine total fortune and spread based on material type (mining_spread + specific spread)
+        // STEP 1: Identify block type and determine fortune/spread/pristine
         let totalFortune = baseFortune;
-        let spreadValue = miningSpread; // Base mining spread applies to all
+        let totalSpread = miningSpread; // Base mining spread
+        let applyPristine = false;
         
         if (props.fortuneType === 'gemstone') {
             totalFortune += gemstoneFortune;
-            spreadValue += gemstoneSpread; // Add gemstone-specific spread on top
+            totalSpread += gemstoneSpread;
+            applyPristine = true;
         } else if (props.fortuneType === 'dwarven_metal') {
             totalFortune += dwarvenFortune;
-            spreadValue += oreSpread; // Dwarven metals use ore spread on top
+            totalSpread += oreSpread;
         } else if (props.fortuneType === 'ore') {
             totalFortune += oreFortune;
-            spreadValue += oreSpread;
+            totalSpread += oreSpread;
         } else if (props.fortuneType === 'block') {
             totalFortune += blockFortune;
-            spreadValue += blockSpread;
+            totalSpread += blockSpread;
         }
 
-        // Calculate mining time in ticks (rounded to nearest integer per wiki)
+        // STEP 2: Calculate break speed (blocks per hour based on block strength and mining speed)
         let ticks = Math.round((props.blockStrength * 30) / miningSpeed);
         if (ticks < 4) ticks = 4;
         const breakTimeSeconds = ticks / 20;
+        const blocksPerHourBase = 3600 / breakTimeSeconds;
 
-        // Calculate spread multiplier
+        // STEP 3: Apply spread (increases effective blocks broken)
         let spreadMultiplier = 1;
-        if (spreadValue > 0) {
-            const guaranteedBlocks = Math.floor(spreadValue / 100);
-            const chancePercent = spreadValue % 100;
+        if (totalSpread > 0) {
+            const guaranteedBlocks = Math.floor(totalSpread / 100);
+            const chancePercent = totalSpread % 100;
             spreadMultiplier = 1 + guaranteedBlocks + (chancePercent / 100);
         }
+        const blocksPerHourWithSpread = blocksPerHourBase * spreadMultiplier;
 
-        // Calculate drops per block
+        // STEP 4: Apply fortune to calculate drops per block
         let dropsPerBlock;
         if (props.fortuneType === 'gemstone') {
             const baseDrop = props.baseDrop || 4;
             const fortuneMultiplier = 1 + (totalFortune / 100);
             const roughGems = baseDrop * fortuneMultiplier;
-            const pristineBonus = pristine / 100 * 0.79;
-            dropsPerBlock = roughGems * (1 + pristineBonus) * spreadMultiplier;
+            
+            if (applyPristine && pristine > 0) {
+                const pristineBonus = pristine / 100 * 0.79;
+                dropsPerBlock = roughGems * (1 + pristineBonus);
+            } else {
+                dropsPerBlock = roughGems;
+            }
         } else {
             const baseDrop = props.baseDrop || 1;
-            dropsPerBlock = baseDrop * (1 + (totalFortune / 100)) * spreadMultiplier;
+            const fortuneMultiplier = 1 + (totalFortune / 100);
+            dropsPerBlock = baseDrop * fortuneMultiplier;
         }
 
+        // STEP 5: Apply efficiency (reduces effective mining rate)
+        const blocksPerHourActual = blocksPerHourWithSpread * efficiency;
+        
         // Calculate blocks needed and time
         const blocksNeeded = Math.ceil(quantity / dropsPerBlock);
-        const blocksPerHourActual = (3600 / breakTimeSeconds) * efficiency;
         const hoursNeeded = blocksNeeded / blocksPerHourActual;
         const minutesNeeded = hoursNeeded * 60;
 
