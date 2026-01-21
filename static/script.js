@@ -728,7 +728,9 @@ function calculateMiningTime() {
     const dwarvenFortune = parseFloat(document.getElementById('dwarven-fortune').value) || 0;
     const gemstoneFortune = parseFloat(document.getElementById('gemstone-fortune').value) || 0;
     const pristine = parseFloat(document.getElementById('pristine').value) || 0;
-    const miningSpread = parseFloat(document.getElementById('mining-spread').value) || 0;
+    const oreSpread = parseFloat(document.getElementById('ore-spread').value) || 0;
+    const blockSpread = parseFloat(document.getElementById('block-spread').value) || 0;
+    const dwarvenSpread = parseFloat(document.getElementById('dwarven-spread').value) || 0;
     const gemstoneSpread = parseFloat(document.getElementById('gemstone-spread').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) / 100;
     const targetQuantity = parseFloat(document.getElementById('target-quantity').value);
@@ -745,7 +747,7 @@ function calculateMiningTime() {
                        materialSelect.includes('amber') || materialSelect.includes('topaz') || 
                        materialSelect.includes('jasper');
 
-    // Determine fortune type
+    // Determine fortune type and spread value
     let totalFortune = baseFortune;
     let spreadValue = 0;
     
@@ -754,14 +756,26 @@ function calculateMiningTime() {
         spreadValue = gemstoneSpread;
     } else if (materialSelect.includes('mithril') || materialSelect.includes('titanium')) {
         totalFortune += dwarvenFortune;
-        spreadValue = miningSpread;
+        spreadValue = dwarvenSpread;
     } else if (materialSelect.includes('coal') || materialSelect.includes('iron') || 
-               materialSelect.includes('gold') || materialSelect.includes('diamond')) {
-        totalFortune += oreFortune;
-        spreadValue = miningSpread;
+               materialSelect.includes('gold') || materialSelect.includes('diamond') ||
+               materialSelect.includes('redstone')) {
+        // Check if it's a block or ore
+        if (materialSelect.includes('coal-') || materialSelect.includes('iron-') || 
+            materialSelect.includes('gold-') || materialSelect.includes('diamond-') ||
+            materialSelect.includes('redstone-')) {
+            // It's a block (has block strength in name)
+            totalFortune += blockFortune;
+            spreadValue = blockSpread;
+        } else {
+            // It's an ore
+            totalFortune += oreFortune;
+            spreadValue = oreSpread;
+        }
     } else {
+        // Default to block (e.g., hardstone)
         totalFortune += blockFortune;
-        spreadValue = miningSpread;
+        spreadValue = blockSpread;
     }
 
     // Calculate mining time in ticks
@@ -844,7 +858,9 @@ function calculateMiningBreakdown(materials) {
     const dwarvenFortune = parseFloat(document.getElementById('dwarven-fortune').value) || 0;
     const gemstoneFortune = parseFloat(document.getElementById('gemstone-fortune').value) || 0;
     const pristine = parseFloat(document.getElementById('pristine').value) || 0;
-    const miningSpread = parseFloat(document.getElementById('mining-spread').value) || 0;
+    const oreSpread = parseFloat(document.getElementById('ore-spread').value) || 0;
+    const blockSpread = parseFloat(document.getElementById('block-spread').value) || 0;
+    const dwarvenSpread = parseFloat(document.getElementById('dwarven-spread').value) || 0;
     const gemstoneSpread = parseFloat(document.getElementById('gemstone-spread').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) / 100 || 0.5;
 
@@ -866,7 +882,7 @@ function calculateMiningBreakdown(materials) {
             continue;
         }
 
-        // Determine total fortune based on material type
+        // Determine total fortune and spread based on material type
         let totalFortune = baseFortune;
         let spreadValue = 0;
         
@@ -875,13 +891,13 @@ function calculateMiningBreakdown(materials) {
             spreadValue = gemstoneSpread;
         } else if (props.fortuneType === 'dwarven_metal') {
             totalFortune += dwarvenFortune;
-            spreadValue = miningSpread;
+            spreadValue = dwarvenSpread;
         } else if (props.fortuneType === 'ore') {
             totalFortune += oreFortune;
-            spreadValue = miningSpread;
+            spreadValue = oreSpread;
         } else if (props.fortuneType === 'block') {
             totalFortune += blockFortune;
-            spreadValue = miningSpread;
+            spreadValue = blockSpread;
         }
 
         // Calculate mining time in ticks
@@ -962,7 +978,9 @@ function getMiningStats() {
         dwarven_fortune: document.getElementById('dwarven-fortune').value,
         gemstone_fortune: document.getElementById('gemstone-fortune').value,
         pristine: document.getElementById('pristine').value,
-        mining_spread: document.getElementById('mining-spread').value,
+        ore_spread: document.getElementById('ore-spread').value,
+        block_spread: document.getElementById('block-spread').value,
+        dwarven_spread: document.getElementById('dwarven-spread').value,
         gemstone_spread: document.getElementById('gemstone-spread').value,
         efficiency: document.getElementById('efficiency').value
     };
@@ -976,7 +994,9 @@ function setMiningStats(stats) {
     if (stats.dwarven_fortune) document.getElementById('dwarven-fortune').value = stats.dwarven_fortune;
     if (stats.gemstone_fortune) document.getElementById('gemstone-fortune').value = stats.gemstone_fortune;
     if (stats.pristine) document.getElementById('pristine').value = stats.pristine;
-    if (stats.mining_spread) document.getElementById('mining-spread').value = stats.mining_spread;
+    if (stats.ore_spread) document.getElementById('ore-spread').value = stats.ore_spread;
+    if (stats.block_spread) document.getElementById('block-spread').value = stats.block_spread;
+    if (stats.dwarven_spread) document.getElementById('dwarven-spread').value = stats.dwarven_spread;
     if (stats.gemstone_spread) document.getElementById('gemstone-spread').value = stats.gemstone_spread;
     if (stats.efficiency) document.getElementById('efficiency').value = stats.efficiency;
 }
