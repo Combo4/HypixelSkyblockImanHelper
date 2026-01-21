@@ -25,15 +25,15 @@ const MATERIAL_PROPERTIES = {
     "Diamond Block": { type: "block", blockStrength: 3000, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
     "Redstone Block": { type: "block", blockStrength: 1500, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
     
-    // Pure Ores (drop 9 items when mined)
-    "Coal": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
-    "Iron Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
-    "Iron Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
-    "Gold Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
-    "Gold Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
-    "Diamond Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
-    "Diamond": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
-    "Redstone": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
+    // Pure Ores (base drops: 4-6 average 5, redstone is doubled to 8-12 average 10)
+    "Coal": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 5 },
+    "Iron Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 5 },
+    "Iron Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 5 },
+    "Gold Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 5 },
+    "Gold Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 5 },
+    "Diamond Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 5 },
+    "Diamond": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 5 },
+    "Redstone": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 10 },
     
     // Dwarven base materials
     "Mithril": { type: "dwarven_metal", blockStrength: 800, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
@@ -782,8 +782,7 @@ function calculateMiningTime() {
     let spreadMultiplier = 1;
     if (totalSpread > 0) {
         const guaranteedBlocks = Math.floor(totalSpread / 100);
-        const chancePercent = totalSpread % 100;
-        spreadMultiplier = 1 + guaranteedBlocks + (chancePercent / 100);
+        spreadMultiplier = 1 + guaranteedBlocks;
     }
     const blocksPerHourWithSpread = blocksPerHourBase * spreadMultiplier;
 
@@ -936,8 +935,7 @@ function calculateMiningBreakdown(materials) {
         let spreadMultiplier = 1;
         if (totalSpread > 0) {
             const guaranteedBlocks = Math.floor(totalSpread / 100);
-            const chancePercent = totalSpread % 100;
-            spreadMultiplier = 1 + guaranteedBlocks + (chancePercent / 100);
+            spreadMultiplier = 1 + guaranteedBlocks;
         }
         const blocksPerHourWithSpread = blocksPerHourBase * spreadMultiplier;
 
