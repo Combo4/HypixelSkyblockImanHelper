@@ -27,26 +27,26 @@ const MATERIAL_PROPERTIES = {
     
     // Ores and base materials (drop 1 item when mined)
     "Coal": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Iron Ore": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Iron Ingot": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Gold Ore": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Gold Ingot": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Diamond Ore": { type: "ore", blockStrength: 3000, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Diamond": { type: "ore", blockStrength: 3000, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Redstone": { type: "ore", blockStrength: 1500, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Iron Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Iron Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Gold Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Gold Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Diamond Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Diamond": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    "Redstone": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
     
     // Dwarven base materials
-    "Mithril": { type: "dwarven_metal", blockStrength: 1500, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
+    "Mithril": { type: "dwarven_metal", blockStrength: 800, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
     "Titanium": { type: "dwarven_metal", blockStrength: 2000, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
     
     // Gemstones
-    "Ruby": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
-    "Sapphire": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
-    "Jade": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
-    "Amethyst": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
-    "Amber": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
-    "Topaz": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
-    "Jasper": { type: "gemstone", blockStrength: 3200, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Ruby": { type: "gemstone", blockStrength: 2300, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Sapphire": { type: "gemstone", blockStrength: 3000, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Jade": { type: "gemstone", blockStrength: 3000, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Amethyst": { type: "gemstone", blockStrength: 3000, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Amber": { type: "gemstone", blockStrength: 3000, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Topaz": { type: "gemstone", blockStrength: 3800, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
+    "Jasper": { type: "gemstone", blockStrength: 4800, fortuneType: "gemstone", spreadType: "gemstone", baseDrop: 4 },
     
     // Non-mineable materials (will be skipped in mining calculations)
     "Glacite Jewel": { type: "non_mineable" },
