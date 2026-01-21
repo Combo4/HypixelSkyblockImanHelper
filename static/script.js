@@ -784,8 +784,8 @@ function calculateMiningTime() {
     // Softcap: minimum 4 ticks
     if (ticks < 4) ticks = 4;
     
-    // Convert to seconds (1 tick = 0.05s)
-    const breakTimeSeconds = ticks * 0.05;
+    // Convert to seconds (divide by 20 per wiki formula)
+    const breakTimeSeconds = ticks / 20;
 
     // Calculate spread multiplier
     let spreadMultiplier = 1;
@@ -839,7 +839,7 @@ function calculateMiningTime() {
 
     // Display results
     const spreadInfo = spreadMultiplier > 1 ? ` (×${spreadMultiplier.toFixed(2)} spread)` : '';
-    document.getElementById('break-ticks').textContent = `${ticks} ticks (${(ticks * 0.05).toFixed(2)}s)`;
+    document.getElementById('break-ticks').textContent = `${ticks} ticks (${(ticks / 20).toFixed(3)}s)`;
     document.getElementById('drops-per-block').textContent = `${dropsPerBlock.toFixed(2)}${spreadInfo}`;
     document.getElementById('blocks-needed').textContent = blocksNeeded.toLocaleString();
     document.getElementById('blocks-per-hour').textContent = Math.floor(blocksPerHourActual).toLocaleString();
@@ -903,7 +903,7 @@ function calculateMiningBreakdown(materials) {
         // Calculate mining time in ticks (rounded to nearest integer per wiki)
         let ticks = Math.round((props.blockStrength * 30) / miningSpeed);
         if (ticks < 4) ticks = 4;
-        const breakTimeSeconds = ticks * 0.05;
+        const breakTimeSeconds = ticks / 20;
 
         // Calculate spread multiplier
         let spreadMultiplier = 1;
