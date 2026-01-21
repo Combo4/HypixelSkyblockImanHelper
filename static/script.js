@@ -25,15 +25,15 @@ const MATERIAL_PROPERTIES = {
     "Diamond Block": { type: "block", blockStrength: 3000, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
     "Redstone Block": { type: "block", blockStrength: 1500, fortuneType: "block", spreadType: "mining", baseDrop: 9 },
     
-    // Ores and base materials (drop 1 item when mined)
-    "Coal": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Iron Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Iron Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Gold Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Gold Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Diamond Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Diamond": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
-    "Redstone": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 1 },
+    // Pure Ores (drop 9 items when mined)
+    "Coal": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
+    "Iron Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
+    "Iron Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
+    "Gold Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
+    "Gold Ingot": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
+    "Diamond Ore": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
+    "Diamond": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
+    "Redstone": { type: "ore", blockStrength: 600, fortuneType: "ore", spreadType: "mining", baseDrop: 9 },
     
     // Dwarven base materials
     "Mithril": { type: "dwarven_metal", blockStrength: 800, fortuneType: "dwarven_metal", spreadType: "mining", baseDrop: 1 },
