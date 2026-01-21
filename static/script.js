@@ -788,9 +788,40 @@ function calculateMiningTime() {
     const blocksPerHourWithSpread = blocksPerHourBase * spreadMultiplier;
 
     // STEP 4: Apply fortune to calculate drops per block
+    // First, determine base drop from material name
+    let materialBaseDrop = 1; // Default fallback
+    
+    // Try to match material from dropdown to MATERIAL_PROPERTIES
+    const materialNameMap = {
+        'ruby': 'Ruby',
+        'sapphire': 'Sapphire',
+        'jade': 'Jade',
+        'amethyst': 'Amethyst',
+        'amber': 'Amber',
+        'topaz': 'Topaz',
+        'jasper': 'Jasper',
+        'coal': 'Coal',
+        'iron': 'Iron Ore',
+        'gold': 'Gold Ore',
+        'diamond': 'Diamond',
+        'redstone': 'Redstone',
+        'mithril': 'Mithril',
+        'titanium': 'Titanium',
+        'hardstone': 'Hard Stone'
+    };
+    
+    for (const [key, matName] of Object.entries(materialNameMap)) {
+        if (materialSelect.includes(key)) {
+            if (MATERIAL_PROPERTIES[matName]) {
+                materialBaseDrop = MATERIAL_PROPERTIES[matName].baseDrop || 1;
+            }
+            break;
+        }
+    }
+    
     let dropsPerBlock;
     if (isGemstone) {
-        const baseDrop = 4; // Gemstones drop 3-5, average = 4
+        const baseDrop = materialBaseDrop;
         const fortuneMultiplier = 1 + (totalFortune / 100);
         const roughGems = baseDrop * fortuneMultiplier;
         
@@ -802,7 +833,7 @@ function calculateMiningTime() {
             dropsPerBlock = roughGems;
         }
     } else {
-        const baseDrop = 1;
+        const baseDrop = materialBaseDrop;
         const fortuneMultiplier = 1 + (totalFortune / 100);
         dropsPerBlock = baseDrop * fortuneMultiplier;
     }
