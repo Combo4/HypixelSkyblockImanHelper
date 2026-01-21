@@ -878,8 +878,7 @@ function calculateMiningTime() {
             { name: 'Blue Wool Mithril', blockStrength: 1500, baseDrop: 5 }
         ];
         
-        let bestVariant = null;
-        let bestItemsPerHour = 0;
+        let recommendations = [];
         
         for (const variant of mithrilVariants) {
             const variantTicks = Math.round((variant.blockStrength * 30) / miningSpeed);
@@ -889,18 +888,36 @@ function calculateMiningTime() {
             const variantDropsPerBlock = variant.baseDrop * fortuneMultiplier;
             const variantItemsPerHour = variantBlocksPerHour * variantDropsPerBlock;
             
-            if (variantItemsPerHour > bestItemsPerHour) {
-                bestItemsPerHour = variantItemsPerHour;
-                bestVariant = variant;
-            }
+            recommendations.push({
+                variant: variant,
+                itemsPerHour: variantItemsPerHour,
+                blocksPerHour: Math.floor(variantBlocksPerHour),
+                dropsPerBlock: variantDropsPerBlock.toFixed(2)
+            });
         }
         
-        if (bestVariant) {
-            showToast(`💡 Best variant: ${bestVariant.name} (${Math.floor(bestItemsPerHour).toLocaleString()} items/hour)`, 'success');
+        // Sort by items per hour descending
+        recommendations.sort((a, b) => b.itemsPerHour - a.itemsPerHour);
+        
+        if (recommendations.length > 0) {
+            const best = recommendations[0];
+            
+            // Display detailed recommendation
+            let recText = `<strong style="color: #ffaa00;">${best.variant.name}</strong> is optimal for your mining speed!<br><br>`;
+            recText += `<strong>All variants comparison:</strong><br>`;
+            recommendations.forEach((rec, idx) => {
+                const icon = idx === 0 ? '🏆' : idx === 1 ? '🥈' : '🥉';
+                recText += `${icon} <strong>${rec.variant.name}</strong>: ${Math.floor(rec.itemsPerHour).toLocaleString()} items/hour (${rec.dropsPerBlock} drops/block, ${rec.blocksPerHour.toLocaleString()} blocks/hour)<br>`;
+            });
+            
+            document.getElementById('mithril-rec-text').innerHTML = recText;
+            document.getElementById('mithril-recommendation').style.display = 'block';
         }
     } else {
-        showToast('Mining time calculated!');
+        document.getElementById('mithril-recommendation').style.display = 'none';
     }
+    
+    showToast('Mining time calculated!');
 }
 
 // Calculate mining breakdown for all raw materials
