@@ -778,8 +778,8 @@ function calculateMiningTime() {
         spreadValue = blockSpread;
     }
 
-    // Calculate mining time in ticks
-    let ticks = Math.floor((blockStrength * 30) / miningSpeed);
+    // Calculate mining time in ticks (rounded to nearest integer per wiki)
+    let ticks = Math.round((blockStrength * 30) / miningSpeed);
     
     // Softcap: minimum 4 ticks
     if (ticks < 4) ticks = 4;
@@ -900,8 +900,8 @@ function calculateMiningBreakdown(materials) {
             spreadValue = blockSpread;
         }
 
-        // Calculate mining time in ticks
-        let ticks = Math.floor((props.blockStrength * 30) / miningSpeed);
+        // Calculate mining time in ticks (rounded to nearest integer per wiki)
+        let ticks = Math.round((props.blockStrength * 30) / miningSpeed);
         if (ticks < 4) ticks = 4;
         const breakTimeSeconds = ticks * 0.05;
 
